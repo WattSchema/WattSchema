@@ -1,0 +1,1546 @@
+@prefix dcpm: <https://qcells.com/schema/dcpm#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix rec: <https://w3id.org/rec#> .
+@prefix qudt: <http://qudt.org/schema/qudt/> .
+@prefix quantityKind:  <http://qudt.org/vocab/quantityKind/> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix brick: <https://brickschema.org/schema/Brick#> .
+@prefix s223: <http://data.ashrae.org/standard223#> .
+@prefix di: <http://opcfoundation.org/UA/DI/> .
+@prefix sdo: <https://schema.org/> .
+
+<https://qcells.com/schema/1.0/dcpm> a owl:Ontology ;
+    rdfs:label "DCPM Core" ;
+    rdfs:comment "Data Center Power Management (DCPM) Core Ontology version 1.0" ;
+    owl:imports <http://opcfoundation.org/UA/DI/> ,
+                <http://data.ashrae.org/standard223> ,
+                <https://brickschema.org/schema/Brick> ,
+                <http://qudt.org/3.1.0/vocab/quantitykind>,
+                <http://qudt.org/3.1.0/vocab/unit> ;
+    owl:versionIRI <https://qcells.com/schema/1.0/dcpm> ;
+    owl:versionInfo "1.0" .
+
+# ===========================
+# System Properties 
+# ===========================
+dcpm:SiteType a owl:Class ;
+  rdfs:label "Site" ;
+  rdfs:subClassOf rec:Site ;
+  rdfs:subClassOf s223:PhysicalSpace ;
+  rdfs:comment "The top-level container for a single physical site or data center." .
+
+dcpm:ElectricalRoom a owl:Class ;
+  rdfs:label "Electrical Room" ;
+  rdfs:subClassOf rec:Room ;
+  rdfs:subClassOf s223:PhysicalSpace ;
+  owl:equivalentClass brick:Electrical_Room .
+
+dcpm:DataHall a owl:Class ;
+  rdfs:label "Data Hall" ;
+  rdfs:subClassOf rec:Room ;
+  rdfs:subClassOf s223:PhysicalSpace .
+
+dcpm:BatteryRoom a owl:Class ;
+  rdfs:label "Battery Room" ;
+  rdfs:subClassOf rec:Room ;
+  rdfs:subClassOf s223:PhysicalSpace ;
+  owl:equivalentClass brick:Battery_Room .
+
+dcpm:GeneratorYard a owl:Class ;
+  rdfs:label "Generator Yard" ;
+  rdfs:subClassOf rec:OutdoorSpace ;
+  rdfs:subClassOf s223:PhysicalSpace ;
+  rdfs:subClassOf brick:Outdoor_Area .
+
+dcpm:GeneratorRoom a owl:Class ;
+  rdfs:label "Generator Room" ;
+  rdfs:subClassOf rec:Room ;
+  rdfs:subClassOf s223:PhysicalSpace ;
+  rdfs:subClassOf brick:Electrical_Room .
+
+# ===================================
+# Device Information Type Models
+# ===================================
+dcpm:DeviceType a owl:Class ;
+  rdfs:label "Device Type" ;
+  owl:equivalentClass di:DeviceType ;
+  rdfs:subClassOf brick:Equipment, s223:Equipment ;
+  rdfs:comment "A general class representing types of devices in the data center, used for modeling static information and specifications." .
+
+dcpm:PowerDeviceType a owl:Class ;
+  rdfs:label "PowerDevice" ;
+  rdfs:subClassOf dcpm:DeviceType ;
+  rdfs:comment "A class representing types of power-related devices in the data center, such as switchgear, transformers, UPS, etc." .
+
+dcpm:SwitchgearType a owl:Class ;
+  owl:equivalentClass brick:Switchgear ;
+  rdfs:label "Switchgear" ;
+  rdfs:comment "Represents the main switchgear that receives power from the utility and distributes it to the site." ;
+  rdfs:subClassOf dcpm:PowerDeviceType .
+
+dcpm:FeederType a owl:Class ;
+  rdfs:label "Feeder" ;
+  rdfs:comment "Represents an individual feeder circuit within a switchgear or panelboard." ;
+  rdfs:subClassOf dcpm:PowerDeviceType .
+
+dcpm:TransformerType a owl:Class ;
+  rdfs:subClassOf s223:ElectricEnergyTransformer ;
+  owl:equivalentClass brick:Transformer ;
+  rdfs:label "Transformer" ;
+  rdfs:comment "Represents a power transformer." ;
+  rdfs:subClassOf dcpm:PowerDeviceType .
+
+dcpm:ATSType a owl:Class ;
+  owl:equivalentClass brick:Automatic_Transfer_Switch ;
+  rdfs:label "Automatic Transfer Switch" ;
+  rdfs:comment "Represents an Automatic Transfer Switch." ;
+  rdfs:subClassOf dcpm:PowerDeviceType .
+
+dcpm:UPSType a owl:Class ;
+  owl:equivalentClass brick:Uninterruptible_Power_Supply ;
+  rdfs:label "Uninterruptible Power Supply" ;
+  rdfs:comment "Represents an Uninterruptible Power Supply." ;
+  rdfs:subClassOf dcpm:PowerDeviceType .
+
+dcpm:BESSType a owl:Class ;
+  owl:equivalentClass brick:Battery_Energy_Storage_System ;
+  rdfs:label "Battery Energy Storage System" ;
+  rdfs:comment "Represents a Battery Energy Storage System, including the Power Conversion System (PCS)." ;
+  rdfs:subClassOf dcpm:PowerDeviceType .
+
+dcpm:BMSType a owl:Class ;
+  rdfs:subClassOf brick:Electrical_Equipment ;
+  rdfs:label "Battery Management System" ;
+  rdfs:comment "Represents a standalone Battery Management System." ;
+  rdfs:subClassOf dcpm:PowerDeviceType .
+
+dcpm:GeneratorSetType a owl:Class ;
+  owl:equivalentClass s223:Generator ;
+  owl:equivalentClass brick:Generator ;
+  rdfs:label "Diesel/Gas Generator" ;
+  rdfs:comment "Represents a generator set." ;
+  rdfs:subClassOf dcpm:PowerDeviceType .
+
+dcpm:PDUType a owl:Class ;
+  rdfs:subClassOf brick:Electrical_Equipment ;
+  rdfs:label "Power Distribution Unit" ;
+  rdfs:comment "Represents a floor-level or mains Power Distribution Unit." ;
+  rdfs:subClassOf dcpm:PowerDeviceType .
+
+dcpm:RPPType a owl:Class ;
+  rdfs:subClassOf brick:Electrical_Equipment ;
+  rdfs:label "Remote Power Panel" ;
+  rdfs:comment "Represents a Remote Power Panel, similar to a PDU but typically smaller and closer to the load." ;
+  rdfs:subClassOf dcpm:PDUType .
+
+dcpm:BuswayType a owl:Class ;
+  rdfs:subClassOf brick:Electrical_Equipment ;
+  rdfs:label "Busway and Bus Duct" ;
+  rdfs:comment "Represents a busway power distribution system." ;
+  rdfs:subClassOf dcpm:PowerDeviceType .
+
+dcpm:RackPDUType a owl:Class ;
+  rdfs:subClassOf brick:Electrical_Equipment ;
+  rdfs:label "Rack Power Distribution Unit" ;
+  rdfs:comment "Represents a rack-mounted PDU with outlet-level monitoring and control." ;
+  rdfs:subClassOf dcpm:PDUType .
+
+dcpm:STSType a owl:Class ;
+  owl:equivalentClass brick:Static_Transfer_Switch ;
+  rdfs:label "Static Transfer Switch" ;
+  rdfs:comment "Represents a Static Transfer Switch." ;
+  rdfs:subClassOf dcpm:ATSType .
+
+dcpm:PQMeterType a owl:Class ;
+  rdfs:subClassOf brick:Meter ;
+  rdfs:label "Power Quality Meter" ;
+  rdfs:comment "Represents a dedicated power quality monitoring device." ;
+  rdfs:subClassOf dcpm:PowerDeviceType .
+
+dcpm:GatewayType a owl:Class ;
+  owl:equivalentClass brick:Gateway ;
+  rdfs:label "Gateway / SCADA" ;
+  rdfs:comment "Represents a Gateway or SCADA." ;
+  rdfs:subClassOf dcpm:PowerDeviceType .
+
+dcpm:ControllerType a owl:Class ;
+  owl:equivalentClass s223:Controller ;
+  owl:equivalentClass brick:Controller ;
+  rdfs:label "PLC Controls" ;
+  rdfs:comment "Represents a site controller or PLC." ;
+  rdfs:subClassOf dcpm:PowerDeviceType .
+
+dcpm:MCCType a owl:Class ;
+  owl:equivalentClass brick:Motor_Control_Center ;
+  rdfs:label "Motor Control Center" ;
+  rdfs:comment "Represents a Motor Control Center." ;
+  rdfs:subClassOf dcpm:PowerDeviceType .
+
+dcpm:MotorFeederType a owl:Class ;
+  rdfs:subClassOf brick:Electrical_Equipment ;
+  rdfs:label "Motor Feeder" ;
+  rdfs:comment "Represents an individual motor starter/feeder within an MCC." ;
+  rdfs:subClassOf dcpm:PowerDeviceType .
+
+dcpm:SPDType a owl:Class ;
+  rdfs:subClassOf brick:Electrical_Equipment ;
+  rdfs:label "Surge Protective Device" ;
+  rdfs:comment "Represents a Surge Protective Device." ;
+  rdfs:subClassOf dcpm:PowerDeviceType .
+
+dcpm:GroundingNetworkType a owl:Class ;
+  rdfs:subClassOf brick:Electrical_Equipment ;
+  rdfs:label "Grounding & Bonding Network" ;
+  rdfs:comment "Represents the monitoring points of the facility grounding system." ;
+  rdfs:subClassOf dcpm:PowerDeviceType .
+
+dcpm:UtilityMeterType a owl:Class ;
+  rdfs:subClassOf s223:ElectricityMeter ;
+  rdfs:subClassOf brick:Electrical_Meter ;
+  rdfs:label "Utility Meter" ;
+  rdfs:subClassOf dcpm:PowerDeviceType .
+
+dcpm:ITRackType a owl:Class ;
+  rdfs:subClassOf brick:ICT_Equipment ;
+  rdfs:subClassOf dcpm:PowerDeviceType ;
+  rdfs:label "IT Rack" .
+
+# ========================================
+# Common Structures and classes
+# ========================================
+
+dcpm:BatteryMetricsType a owl:Class ;
+  rdfs:label "Battery Metrics Type" .
+
+dcpm:BatteryStringMetricsType a owl:Class ;
+  rdfs:label "Battery String Metrics Type" .
+
+dcpm:CellMetricsType a owl:Class ;
+  rdfs:label "Cell Metrics Type" .
+
+dcpm:ElectricalMeasurementsType a owl:Class ;
+  rdfs:label "Electrical Measurements Type" .
+
+dcpm:TelemetryStream a owl:Class ;
+  rdfs:label "Telemetry Stream" ;
+  rdfs:comment "A logical grouping of related telemetry points for a given device (e.g., Input, Output, Battery)" .
+
+dcpm:TelemetryPoint a owl:Class ;
+    rdfs:label "Telemetry Point" ;
+    rdfs:comment "Represents a single measured data point such as voltage, current, frequency, etc." .
+
+dcpm:SOP a owl:Class ;
+  rdfs:label "SOP" ;
+  rdfs:comment "Standard Operating Procedures (SOPs) for critical equipment." .
+
+dcpm:MOP a owl:Class ;
+  rdfs:label "MOP" ;
+  rdfs:comment "Method of Procedure (MOPs) for equipment maintenance tasks." .
+
+dcpm:Document a owl:Class ;
+  rdfs:label "Document" ;
+  rdfs:comment "Represents any internal or external documentation associated with a device." .
+
+dcpm:KPI a owl:Class ;
+  rdfs:label "KPI" ;
+  rdfs:comment "Key Performance Indicator (KPI) for monitoring device or system performance." .
+
+dcpm:PointOfInterconnection a owl:Class ;
+rdfs:label "Point of Interconnection (POI)" ;
+rdfs:comment "Electrical (or other) point of interconnection with the grid or utility—e.g. meter point for settlement, demand, or value stream participation. Optimization may treat POI as the boundary for demand, export, or program eligibility." .
+
+dcpm:ValueStream a owl:Class ;
+rdfs:label "Value Stream" ;
+rdfs:comment "An entity representing a revenue or cost optimization pathway (e.g., demand response, energy arbitrage, bill reduction). A value stream MAY be associated with a Point of Interconnection entity, a Site entity, and/or an Equipment entity—depending on where the program is defined or measured (e.g. at the meter, site, or specific asset)." .
+
+# ========================================
+# Static Properties for System
+# ========================================
+dcpm:url a owl:DatatypeProperty ;
+    rdfs:range xsd:anyURI ;
+    rdfs:label "URL" ;
+    rdfs:subPropertyOf sdo:url ;
+    rdfs:comment "URL link to the any type of content." .
+
+dcpm:preferredName a owl:DatatypeProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "Preferred Name" ;
+    rdfs:subPropertyOf skos:prefLabel ;
+    rdfs:comment "Preferred name of the entity, which may differ from the label used." .
+
+dcpm:legalEntityName a owl:DatatypeProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "Legal Entity Name" ;
+    rdfs:subPropertyOf sdo:legalName ;
+    rdfs:comment "Legal entity name of the organization that owns or operates the data center." .
+
+dcpm:timeZone a owl:DatatypeProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "Time Zone" ;
+    rdfs:comment "Time zone of the location, typically in IANA format (e.g., 'America/New_York')." .
+
+dcpm:primaryBusinessSegment a owl:DatatypeProperty ;
+    rdfs:range dcpm:BusinessSegmentEnum ;
+    rdfs:label "Primary Business Segment" ;
+    rdfs:comment "Primary business segment of the data center (e.g., Hyperscale, Colocation, Enterprise, Edge)." .
+
+# ========================================
+# Static Properties for PowerDeviceType 
+# ========================================
+dcpm:manufacturer a owl:DatatypeProperty ;
+    owl:equivalentProperty di:Manufacturer ;
+    rdfs:range xsd:string ;
+    rdfs:label "Manufacturer" ;
+    rdfs:comment "Manufacturer name of the power device (aligned with OPC UA DI:Manufacturer)." .
+
+dcpm:model a owl:DatatypeProperty ;
+    owl:equivalentProperty di:Model ;
+    rdfs:range xsd:string ;
+    rdfs:label "Model Name" ;
+    rdfs:comment "Device model name or identifier (aligned with OPC UA DI:Model)." .
+
+dcpm:serialNumber a owl:DatatypeProperty ;
+    owl:equivalentProperty di:SerialNumber ;
+    rdfs:range xsd:string ;
+    rdfs:label "Serial Number" ;
+    rdfs:comment "Unique serial number assigned by the manufacturer (aligned with OPC UA DI:SerialNumber)." .
+
+dcpm:softwareRevision a owl:DatatypeProperty ;
+    owl:equivalentProperty di:SoftwareRevision ;
+    rdfs:range xsd:string ;
+    rdfs:label "Software Revision" ;
+    rdfs:comment "Software or controller revision of the device (aligned with OPC UA DI:SoftwareRevision)." .
+
+dcpm:firmwareVersion a owl:DatatypeProperty ;
+    rdfs:subPropertyOf di:SoftwareRevision ;
+    rdfs:range xsd:string ;
+    rdfs:label "Firmware Version" ;
+    rdfs:comment "Firmware version currently running on the device (specialization of OPC UA DI:SoftwareRevision)." .
+
+dcpm:ipAddress a owl:DatatypeProperty ;
+    rdfs:subPropertyOf di:NetworkAddress ;
+    rdfs:range xsd:string ;
+    rdfs:label "IP Address" ;
+    rdfs:comment "IPv4 or IPv6 address assigned to the device (subproperty of DI:NetworkAddress)." .
+
+dcpm:communicationProtocol a owl:DatatypeProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "Communication Protocol" ;
+    rdfs:comment "Communication protocol supported by the device (e.g., Modbus TCP, SNMP, BACnet)." .
+
+dcpm:batteryType a owl:DatatypeProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "Battery Type" ;
+    rdfs:comment "Type of battery used by the device (e.g., VRLA, Li-ion, NiCd)." .
+
+dcpm:batteryStringCount a owl:DatatypeProperty ;
+    rdfs:range xsd:integer ;
+    rdfs:label "Battery String Count" ;
+    rdfs:comment "Number of battery strings or blocks configured in the system." .
+
+dcpm:numberOfPoles a owl:DatatypeProperty ;
+    rdfs:range xsd:integer ;
+    rdfs:label "Number of Poles" ;
+    rdfs:comment "Number of poles in the Automatic Transfer Switch." .
+
+dcpm:transferType a owl:DatatypeProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "Transfer Type" ;
+    rdfs:comment "Transfer type of the ATS (e.g., Open Transition, Closed Transition)." .
+
+dcpm:busbarRating a owl:DatatypeProperty ;
+    rdfs:range xsd:float ;
+    rdfs:label "Busbar Rating (A)" ;
+    rdfs:comment "Busbar current rating of the switchgear in amperes." .
+
+dcpm:breakerType a owl:DatatypeProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "Breaker Type" ;
+    rdfs:comment "Type of circuit breaker used (e.g., Emax 2, Plug-in)." .
+
+dcpm:breakerCount a owl:DatatypeProperty ;
+    rdfs:range xsd:integer ;
+    rdfs:label "Breaker Count" ;
+    rdfs:comment "Number of circuit breakers installed in the switchgear." .
+
+dcpm:impedancePercent a owl:DatatypeProperty ;
+    rdfs:range xsd:float ;
+    rdfs:label "Impedance (%)" ;
+    rdfs:comment "Transformer impedance expressed as percentage." .
+
+dcpm:coolingType a owl:DatatypeProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "Cooling Type" ;
+    rdfs:comment "Cooling method of the PowerDeviceType." .
+
+dcpm:temperatureSensorInstalled a owl:DatatypeProperty ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "Temperature Sensor Installed" ;
+    rdfs:comment "Indicates whether a temperature sensor is installed in the PowerDeviceType." .
+
+dcpm:transferTimeMS a owl:DatatypeProperty ;
+    rdfs:range xsd:float ;
+    rdfs:label "Transfer Time (ms)" ;
+    rdfs:comment "Transfer time of switch during source change, in milliseconds." .
+
+dcpm:preferredSource a owl:DatatypeProperty ;
+    rdfs:range dcpm:SourceEnum ;
+    rdfs:label "Preferred Source" ;
+    rdfs:comment "Preferred input source for the device, defined by SourceEnum (e.g., Utility, Generator, UPS)." .
+
+dcpm:selectedSource a owl:DatatypeProperty ;
+    rdfs:range dcpm:SourceEnum ;
+    rdfs:label "Selected Source" ;
+    rdfs:comment "Currently selected input source for the device, defined by SourceEnum (e.g., Utility, Generator, UPS)." .
+
+dcpm:circuitCount a owl:DatatypeProperty ;
+    rdfs:range xsd:integer ;
+    rdfs:label "Circuit Count" ;
+    rdfs:comment "Number of electrical circuits managed by the PDU or RPP." .
+
+dcpm:buswayConnection a owl:DatatypeProperty ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "Busway Connection" ;
+    rdfs:comment "Indicates whether the PDU is connected to a busway system." .
+
+dcpm:outletCount a owl:DatatypeProperty ;
+    rdfs:range xsd:integer ;
+    rdfs:label "Outlet Count" ;
+    rdfs:comment "Number of output outlets on the rack PDU." .
+
+dcpm:fuelType a owl:DatatypeProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "Fuel Type" ;
+    rdfs:comment "Type of fuel used by the generator (e.g., Diesel, Natural Gas, Propane)." .
+
+dcpm:fuelTankCapacity a owl:DatatypeProperty ;
+  rdfs:range xsd:float ;
+  rdfs:label "Fuel Tank Capacity (L or gal)" ;
+  rdfs:comment "Fuel tank capacity of the generator, in liters or gallons." .
+
+dcpm:hasValue a owl:DatatypeProperty ;
+  rdfs:label "Has Value" ;
+  rdfs:comment "Represents the numeric value associated with a measurement." .
+
+dcpm:formula a owl:DatatypeProperty ;
+  rdfs:label "Formula" ;
+  rdfs:comment "Represents the formula or calculation method used to derive a measurement or KPIs." .
+
+dcpm:calculationRate a owl:DatatypeProperty ;
+  rdfs:label "Calculation Rate" ;
+  rdfs:comment "Represents the rate at which a measurement or KPI is calculated or updated." .
+
+dcpm:pointName a owl:DatatypeProperty ;
+  rdfs:label "Point Name" ;
+  rdfs:range xsd:string ;
+  rdfs:comment "String identifier for a telemetry point, typically following a hierarchical naming convention." .
+
+dcpm:importLimitMax a owl:DatatypeProperty ;
+    rdfs:range xsd:float ;
+    rdfs:label "Import Limit Max (kW or MW)" ;
+    rdfs:comment "Maximum power import at the POI (e.g. kW or MW). Used by optimization to respect grid/contractual limits." .
+
+dcpm:exportLimitMax a owl:DatatypeProperty ;
+    rdfs:range xsd:float ;
+    rdfs:label "Export Limit Max (kW or MW)" ;
+    rdfs:comment "Maximum power export at the POI (e.g. kW or MW). Used by optimization to respect grid/contractual limits." .
+
+dcpm:UPSMode a owl:DatatypeProperty ;
+    rdfs:range dcpm:UPSModeEnum ;
+    rdfs:label "UPS Mode" ;
+    rdfs:comment "Current operating mode of the UPS, defined by UPSModeEnum (e.g., Normal, Battery, Bypass)." .
+
+dcpm:GENMode a owl:DatatypeProperty ;
+    rdfs:range dcpm:GenModeEnum ;
+    rdfs:label "Generator Mode" ;
+    rdfs:comment "Current operating mode of the generator, defined by GenModeEnum (e.g., Off, Starting, Running, Stopped)." .
+
+dcpm:maxLoad a owl:DatatypeProperty ;
+    rdfs:label "Maximum Load" ;
+    rdfs:range xsd:decimal ;
+    rdfs:comment "Represents the maximum load capacity of the device." .
+
+# ========================================
+# Static Properties for Identifiers
+# ========================================
+dcpm:siteId a owl:DatatypeProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "Site Identifier" ;
+    rdfs:comment "A unique identifier for the physical site or data center." .
+
+dcpm:assetId a owl:DatatypeProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "Asset Identifier" ;
+    rdfs:comment "A unique asset identifier assigned to the device." .
+
+dcpm:locationId a owl:DatatypeProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "Location Identifier" ;
+    rdfs:comment "A unique location identifier for the physical location." .
+
+dcpm:POIId a owl:DatatypeProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "POI Identifier" ;
+    rdfs:comment "A unique identifier for the Point of Interconnection (POI) with the utility or grid." .
+
+dcpm:ValueStreamId a owl:DatatypeProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "Value Stream Identifier" ;
+    rdfs:comment "A unique identifier for the value stream " .
+
+dcpm:ValueStreamProgram a owl:DatatypeProperty ;
+    rdfs:range dcpm:ValueStreamProgramEnum ;
+    rdfs:label "Value Stream Program" ;
+    rdfs:comment "Name or identifier of the specific program or initiative associated with the value stream (e.g., demand response program name)." .
+
+dcpm:latitude a owl:DatatypeProperty ;
+    rdfs:range xsd:float ;
+    rdfs:label "Latitude" ;
+    rdfs:subPropertyOf brick:latitude ;
+    rdfs:comment "Latitude coordinate of the site location." .
+
+dcpm:longitude a owl:DatatypeProperty ;
+    rdfs:range xsd:float ;
+    rdfs:label "Longitude" ;
+    rdfs:subPropertyOf brick:longitude ;
+    rdfs:comment "Longitude coordinate of the site location." .
+
+dcpm:tariffReference a owl:DatatypeProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "Tariff Reference" ;
+    rdfs:comment "Reference to the applicable utility tariff or rate schedule for this Point of Interconnection." .
+
+# ===========================
+# Measurement classes
+# ===========================
+dcpm:ActiveEnergy a owl:Class ;
+  rdfs:subClassOf dcpm:TelemetryPoint ;
+  rdfs:label "Active Energy (kWh)" ;
+  qudt:quantityKind quantityKind:ActiveEnergy ;
+  qudt:applicableUnit unit:KiloW-HR,
+                      unit:MegaW-HR,
+                      unit:W-HR ;
+  rdfs:comment "General active energy measurement, can represent import, export, or total energy." .
+
+dcpm:ExportActiveEnergy a owl:Class ;
+  rdfs:label "Active Energy Export (kWh)" ;
+  rdfs:subClassOf dcpm:ActiveEnergy ;
+  qudt:quantityKind quantityKind:ActiveEnergy ;
+  qudt:applicableUnit unit:KiloW-HR,
+                      unit:MegaW-HR,
+                      unit:W-HR .
+
+dcpm:ImportActiveEnergy a owl:Class ;
+  rdfs:label "Active Energy Import (kWh)" ;
+  rdfs:subClassOf dcpm:ActiveEnergy ;
+  qudt:quantityKind quantityKind:ActiveEnergy ;
+  qudt:applicableUnit unit:KiloW-HR,
+                      unit:MegaW-HR,
+                      unit:W-HR .
+
+dcpm:ActivePower a owl:Class ;
+rdfs:subClassOf dcpm:TelemetryPoint ;
+  rdfs:label "Active Power (kW or MW)" ;
+  qudt:quantityKind quantityKind:ActivePower ;
+  qudt:applicableUnit unit:KiloW,
+                      unit:MegaW,
+                      unit:W .
+
+dcpm:ImportActivePower a owl:Class ;
+  rdfs:label "Import Active Power (kW or MW)" ;
+  rdfs:subClassOf dcpm:ActivePower ;
+  qudt:quantityKind quantityKind:ActivePower ;
+  qudt:applicableUnit unit:KiloW,
+                      unit:MegaW,
+                      unit:W ;
+  rdfs:comment "Measured active power flowing into the site or device." .
+
+dcpm:ImportActivePowerL1 a owl:Class ;
+  rdfs:label "Import Active Power L1 (kW or MW)" ;
+  rdfs:subClassOf dcpm:ImportActivePower ;
+  qudt:quantityKind quantityKind:ActivePower ;
+  qudt:applicableUnit unit:KiloW,
+                      unit:MegaW,
+                      unit:W ;
+  rdfs:comment "Measured active power flowing into the site or device on phase L1." .
+
+dcpm:ImportActivePowerL2 a owl:Class ;
+  rdfs:label "Import Active Power L2 (kW or MW)" ;
+  rdfs:subClassOf dcpm:ImportActivePower ;
+  qudt:quantityKind quantityKind:ActivePower ;
+  qudt:applicableUnit unit:KiloW,
+                      unit:MegaW,
+                      unit:W ;
+  rdfs:comment "Measured active power flowing into the site or device on phase L2." .
+
+dcpm:ImportActivePowerL3 a owl:Class ;
+  rdfs:label "Import Active Power L3 (kW or MW)" ;
+  rdfs:subClassOf dcpm:ImportActivePower ;
+  qudt:quantityKind quantityKind:ActivePower ;
+  qudt:applicableUnit unit:KiloW,
+                      unit:MegaW,
+                      unit:W ;
+  rdfs:comment "Measured active power flowing into the site or device on phase L3." .
+
+dcpm:ExportActivePower a owl:Class ;
+  rdfs:label "Export Active Power (kW or MW)" ;
+  rdfs:subClassOf dcpm:ActivePower ;
+  qudt:quantityKind quantityKind:ActivePower ;
+  qudt:applicableUnit unit:KiloW,
+                      unit:MegaW,
+                      unit:W ;
+  rdfs:comment "Measured active power flowing out of the site or device." .
+
+dcpm:ExportActivePowerL1 a owl:Class ;
+  rdfs:label "Export Active Power L1 (kW or MW)" ;
+  rdfs:subClassOf dcpm:ExportActivePower ;
+  qudt:quantityKind quantityKind:ActivePower ;
+  qudt:applicableUnit unit:KiloW,
+                      unit:MegaW,
+                      unit:W ;
+  rdfs:comment "Measured active power flowing out of the site or device on phase L1." .
+
+dcpm:ExportActivePowerL2 a owl:Class ;
+  rdfs:label "Export Active Power L2 (kW or MW)" ;
+  rdfs:subClassOf dcpm:ExportActivePower ;
+  qudt:quantityKind quantityKind:ActivePower ;
+  qudt:applicableUnit unit:KiloW,
+                      unit:MegaW,
+                      unit:W ;
+  rdfs:comment "Measured active power flowing out of the site or device on phase L2." .
+
+dcpm:ExportActivePowerL3 a owl:Class ;
+  rdfs:label "Export Active Power L3 (kW or MW)" ;
+  rdfs:subClassOf dcpm:ExportActivePower ;
+  qudt:quantityKind quantityKind:ActivePower ;
+  qudt:applicableUnit unit:KiloW,
+                      unit:MegaW,
+                      unit:W ;
+  rdfs:comment "Measured active power flowing out of the site or device on phase L3." .
+
+dcpm:BypassActivePower a owl:Class ;
+  rdfs:label "Bypass Active Power (kW or MW)" ;
+  rdfs:subClassOf dcpm:ActivePower ;
+  qudt:quantityKind quantityKind:ActivePower ;
+  qudt:applicableUnit unit:KiloW,
+                      unit:MegaW,
+                      unit:W ;
+  rdfs:comment "Measured active power flowing through the bypass path of a UPS or ATS." .
+
+dcpm:ActivePowerSetpoint a owl:Class ;
+  rdfs:label "Active Power Setpoint (kW or MW)" ;
+  rdfs:subClassOf dcpm:TelemetryPoint ;
+  qudt:quantityKind quantityKind:ActivePower ;
+  qudt:applicableUnit unit:KiloW,
+                      unit:MegaW,
+                      unit:W ;
+  rdfs:comment "Target or commanded active power value for controllable devices." .
+
+dcpm:ChargePowerSetpoint a owl:Class ;
+  rdfs:label "Charge Power Setpoint (kW or MW)" ;
+  rdfs:subClassOf dcpm:ActivePowerSetpoint ;
+  qudt:quantityKind quantityKind:ActivePower ;
+  qudt:applicableUnit unit:KiloW,
+                      unit:MegaW,
+                      unit:W ;
+  rdfs:comment "Target or commanded active power value for battery charging operation." .
+
+dcpm:DischargePowerSetpoint a owl:Class ;
+  rdfs:label "Discharge Power Setpoint (kW or MW)" ;
+  rdfs:subClassOf dcpm:ActivePowerSetpoint ;
+  qudt:quantityKind quantityKind:ActivePower ;
+  qudt:applicableUnit unit:KiloW,
+                      unit:MegaW,
+                      unit:W ;
+  rdfs:comment "Target or commanded active power value for battery discharging operation." .
+
+dcpm:ApparentPower a owl:Class ;
+  rdfs:label "Apparent Power" ;
+  rdfs:subClassOf dcpm:TelemetryPoint ;
+  qudt:quantityKind quantityKind:ApparentPower ;
+  qudt:applicableUnit unit:KiloVA,
+                      unit:MegaVA,
+                      unit:VA .
+
+dcpm:InputApparentPower a owl:Class ;
+  rdfs:label "Input Apparent Power" ;
+  rdfs:subClassOf dcpm:ApparentPower ;
+  qudt:quantityKind quantityKind:ApparentPower ;
+  qudt:applicableUnit unit:KiloVA,
+                      unit:MegaVA,
+                      unit:VA ;
+  rdfs:comment "Measured apparent power flowing into the site or device." .
+
+dcpm:InputApparentPowerL1 a owl:Class ;
+  rdfs:label "Input Apparent Power L1" ;
+  rdfs:subClassOf dcpm:InputApparentPower ;
+  qudt:quantityKind quantityKind:ApparentPower ;
+  qudt:applicableUnit unit:KiloVA,
+                      unit:MegaVA,
+                      unit:VA ;
+  rdfs:comment "Measured apparent power flowing into the site or device on phase L1." .
+
+dcpm:InputApparentPowerL2 a owl:Class ;
+  rdfs:label "Input Apparent Power L2" ;
+  rdfs:subClassOf dcpm:InputApparentPower ;
+  qudt:quantityKind quantityKind:ApparentPower ;
+  qudt:applicableUnit unit:KiloVA,
+                      unit:MegaVA,
+                      unit:VA ;
+  rdfs:comment "Measured apparent power flowing into the site or device on phase L2." .
+
+dcpm:InputApparentPowerL3 a owl:Class ;
+  rdfs:label "Input Apparent Power L3" ;
+  rdfs:subClassOf dcpm:InputApparentPower ;
+  qudt:quantityKind quantityKind:ApparentPower ;
+  qudt:applicableUnit unit:KiloVA,
+                      unit:MegaVA,
+                      unit:VA ;
+  rdfs:comment "Measured apparent power flowing into the site or device on phase L3." .
+
+dcpm:OutputApparentPower a owl:Class ;
+  rdfs:label "Output Apparent Power" ;
+  rdfs:subClassOf dcpm:ApparentPower ;
+  qudt:quantityKind quantityKind:ApparentPower ;
+  qudt:applicableUnit unit:KiloVA,
+                      unit:MegaVA,
+                      unit:VA ;
+  rdfs:comment "Measured apparent power flowing out of the site or device." .
+
+dcpm:OutputApparentPowerL1 a owl:Class ;
+  rdfs:label "Output Apparent Power L1" ;
+  rdfs:subClassOf dcpm:OutputApparentPower ;
+  qudt:quantityKind quantityKind:ApparentPower ;
+  qudt:applicableUnit unit:KiloVA,
+                      unit:MegaVA,
+                      unit:VA ;
+  rdfs:comment "Measured apparent power flowing out of the site or device on phase L1." .
+
+dcpm:OutputApparentPowerL2 a owl:Class ;
+  rdfs:label "Output Apparent Power L2" ;
+  rdfs:subClassOf dcpm:OutputApparentPower ;
+  qudt:quantityKind quantityKind:ApparentPower ;
+  qudt:applicableUnit unit:KiloVA,
+                      unit:MegaVA,
+                      unit:VA ;
+  rdfs:comment "Measured apparent power flowing out of the site or device on phase L2." .
+
+dcpm:OutputApparentPowerL3 a owl:Class ;
+  rdfs:label "Output Apparent Power L3" ;
+  rdfs:subClassOf dcpm:OutputApparentPower ;
+  qudt:quantityKind quantityKind:ApparentPower ;
+  qudt:applicableUnit unit:KiloVA,
+                      unit:MegaVA,
+                      unit:VA ;
+  rdfs:comment "Measured apparent power flowing out of the site or device on phase L3." .
+
+dcpm:Current a owl:Class ;
+  rdfs:label "Current (A)" ;
+  rdfs:subClassOf dcpm:TelemetryPoint ;
+  qudt:quantityKind quantityKind:ElectricCurrent ;
+  qudt:applicableUnit unit:A,
+                      unit:KiloA,
+                      unit:MegaA .
+
+dcpm:InputCurrent a owl:Class ;
+  rdfs:label "Input Current (A)" ;
+  rdfs:subClassOf dcpm:Current ;
+  qudt:quantityKind quantityKind:ElectricCurrent ;
+  qudt:applicableUnit unit:A,
+                      unit:KiloA,
+                      unit:MegaA ;
+  rdfs:comment "Measured current flowing into the site or device." .
+
+dcpm:InputCurrentL1 a owl:Class ;
+  rdfs:label "Input Current L1 (A)" ;
+  rdfs:subClassOf dcpm:InputCurrent ;
+  qudt:quantityKind quantityKind:ElectricCurrent ;
+  qudt:applicableUnit unit:A,
+                      unit:KiloA,
+                      unit:MegaA ;
+  rdfs:comment "Measured current flowing into the site or device on phase L1." .
+
+dcpm:InputCurrentL2 a owl:Class ;
+  rdfs:label "Input Current L2 (A)" ;
+  rdfs:subClassOf dcpm:InputCurrent ;
+  qudt:quantityKind quantityKind:ElectricCurrent ;
+  qudt:applicableUnit unit:A,
+                      unit:KiloA,
+                      unit:MegaA ;
+  rdfs:comment "Measured current flowing into the site or device on phase L2." .
+
+dcpm:InputCurrentL3 a owl:Class ;
+  rdfs:label "Input Current L3 (A)" ;
+  rdfs:subClassOf dcpm:InputCurrent ;
+  qudt:quantityKind quantityKind:ElectricCurrent ;
+  qudt:applicableUnit unit:A,
+                      unit:KiloA,
+                      unit:MegaA ;
+  rdfs:comment "Measured current flowing into the site or device on phase L3." .
+
+dcpm:OutputCurrent a owl:Class ;
+  rdfs:label "Output Current (A)" ;
+  rdfs:subClassOf dcpm:Current ;
+  qudt:quantityKind quantityKind:ElectricCurrent ;
+  qudt:applicableUnit unit:A,
+                      unit:KiloA,
+                      unit:MegaA ;
+  rdfs:comment "Measured current flowing out of the site or device." .
+
+dcpm:OutputCurrentL1 a owl:Class ;
+  rdfs:label "Output Current L1 (A)" ;
+  rdfs:subClassOf dcpm:OutputCurrent ;
+  qudt:quantityKind quantityKind:ElectricCurrent ;
+  qudt:applicableUnit unit:A,
+                      unit:KiloA,
+                      unit:MegaA ;
+  rdfs:comment "Measured current flowing out of the site or device on phase L1." .
+
+dcpm:OutputCurrentL2 a owl:Class ;
+  rdfs:label "Output Current L2 (A)" ;
+  rdfs:subClassOf dcpm:OutputCurrent ;
+  qudt:quantityKind quantityKind:ElectricCurrent ;
+  qudt:applicableUnit unit:A,
+                      unit:KiloA,
+                      unit:MegaA ;
+  rdfs:comment "Measured current flowing out of the site or device on phase L2." .
+
+dcpm:OutputCurrentL3 a owl:Class ;
+  rdfs:label "Output Current L3 (A)" ;
+  rdfs:subClassOf dcpm:OutputCurrent ;
+  qudt:quantityKind quantityKind:ElectricCurrent ;
+  qudt:applicableUnit unit:A,
+                      unit:KiloA,
+                      unit:MegaA ;
+  rdfs:comment "Measured current flowing out of the site or device on phase L3." .
+
+dcpm:DCCurrent a owl:Class ;
+  rdfs:label "DC Current (A)" ;
+  rdfs:subClassOf dcpm:Current ;
+  qudt:quantityKind quantityKind:ElectricCurrent ;
+  qudt:applicableUnit unit:A,
+                      unit:KiloA,
+                      unit:MegaA .
+
+dcpm:Voltage a owl:Class ;
+  rdfs:label "Voltage (V)" ;
+  rdfs:subClassOf dcpm:TelemetryPoint ;
+  qudt:quantityKind quantityKind:Voltage ;
+  qudt:applicableUnit unit:V,
+                      unit:KiloV,
+                      unit:MegaV .
+
+dcpm:InputVoltageLL a owl:Class ;
+  rdfs:label "Line-to-Line Input Voltage (V)" ;
+  rdfs:subClassOf dcpm:Voltage ;
+  qudt:quantityKind quantityKind:Voltage ;
+  qudt:applicableUnit unit:V,
+                      unit:KiloV,
+                      unit:MegaV .
+
+dcpm:OutputVoltageLL a owl:Class ;
+  rdfs:label "Line-to-Line Output Voltage (V)" ;
+  rdfs:subClassOf dcpm:Voltage ;
+  qudt:quantityKind quantityKind:Voltage ;
+  qudt:applicableUnit unit:V,
+                      unit:KiloV,
+                      unit:MegaV .
+
+dcpm:InputVoltageLN a owl:Class ;
+  rdfs:label "Line-to-Neutral Input Voltage (V)" ;
+  rdfs:subClassOf dcpm:Voltage ;
+  qudt:quantityKind quantityKind:Voltage ;
+  qudt:applicableUnit unit:V,
+                      unit:KiloV,
+                      unit:MegaV .
+
+dcpm:OutputVoltageLN a owl:Class ;
+  rdfs:label "Line-to-Neutral Output Voltage (V)" ;
+  rdfs:subClassOf dcpm:Voltage ;
+  qudt:quantityKind quantityKind:Voltage ;
+  qudt:applicableUnit unit:V,
+                      unit:KiloV,
+                      unit:MegaV .
+
+dcpm:InputVoltageL1L2 a owl:Class ;
+  rdfs:label "Input Voltage L1-L2 (V)" ;
+  rdfs:subClassOf dcpm:InputVoltageLL ;
+  qudt:quantityKind quantityKind:Voltage ;
+  qudt:applicableUnit unit:V,
+                      unit:KiloV,
+                      unit:MegaV ;
+  rdfs:comment "Line-to-line voltage measurement for input power." .
+
+dcpm:InputVoltageL2L3 a owl:Class ;
+  rdfs:label "Input Voltage L2-L3 (V)" ;
+  rdfs:subClassOf dcpm:InputVoltageLL ;
+  qudt:quantityKind quantityKind:Voltage ;
+  qudt:applicableUnit unit:V,
+                      unit:KiloV,
+                      unit:MegaV ;
+  rdfs:comment "Line-to-line voltage measurement for input power." .
+
+dcpm:InputVoltageL3L1 a owl:Class ;
+  rdfs:label "Input Voltage L3-L1 (V)" ;
+  rdfs:subClassOf dcpm:InputVoltageLL ;
+  qudt:quantityKind quantityKind:Voltage ;
+  qudt:applicableUnit unit:V,
+                      unit:KiloV,
+                      unit:MegaV ;
+  rdfs:comment "Line-to-line voltage measurement for input power." .
+
+dcpm:OutputVoltageL1L2 a owl:Class ;
+  rdfs:label "Output Voltage L1-L2 (V)" ;
+  rdfs:subClassOf dcpm:OutputVoltageLL ;
+  qudt:quantityKind quantityKind:Voltage ;
+  qudt:applicableUnit unit:V,
+                      unit:KiloV,
+                      unit:MegaV ;
+  rdfs:comment "Line-to-line voltage measurement for output power." .
+
+dcpm:OutputVoltageL2L3 a owl:Class ;
+  rdfs:label "Output Voltage L2-L3 (V)" ;
+  rdfs:subClassOf dcpm:OutputVoltageLL ;
+  qudt:quantityKind quantityKind:Voltage ;
+  qudt:applicableUnit unit:V,
+                      unit:KiloV,
+                      unit:MegaV ;
+  rdfs:comment "Line-to-line voltage measurement for output power." .
+
+dcpm:OutputVoltageL3L1 a owl:Class ;
+  rdfs:label "Output Voltage L3-L1 (V)" ;
+  rdfs:subClassOf dcpm:OutputVoltageLL ;
+  qudt:quantityKind quantityKind:Voltage ;
+  qudt:applicableUnit unit:V,
+                      unit:KiloV,
+                      unit:MegaV ;
+  rdfs:comment "Line-to-line voltage measurement for output power." .
+
+dcpm:InputVoltageL1N a owl:Class ;
+  rdfs:label "Input Voltage L1-N (V)" ;
+  rdfs:subClassOf dcpm:InputVoltageLN ;
+  qudt:quantityKind quantityKind:Voltage ;
+  qudt:applicableUnit unit:V,
+                      unit:KiloV,
+                      unit:MegaV ;
+  rdfs:comment "Line-to-neutral voltage measurement for input power." .
+
+dcpm:InputVoltageL2N a owl:Class ;
+  rdfs:label "Input Voltage L2-N (V)" ;
+  rdfs:subClassOf dcpm:InputVoltageLN ;
+  qudt:quantityKind quantityKind:Voltage ;
+  qudt:applicableUnit unit:V,
+                      unit:KiloV,
+                      unit:MegaV ;
+  rdfs:comment "Line-to-neutral voltage measurement for input power." .
+
+dcpm:InputVoltageL3N a owl:Class ;
+  rdfs:label "Input Voltage L3-N (V)" ;
+  rdfs:subClassOf dcpm:InputVoltageLN ;
+  qudt:quantityKind quantityKind:Voltage ;
+  qudt:applicableUnit unit:V,
+                      unit:KiloV,
+                      unit:MegaV ;
+  rdfs:comment "Line-to-neutral voltage measurement for input power." .
+
+dcpm:OutputVoltageL1N a owl:Class ;
+  rdfs:label "Output Voltage L1-N (V)" ;
+  rdfs:subClassOf dcpm:OutputVoltageLN ;
+  qudt:quantityKind quantityKind:Voltage ;
+  qudt:applicableUnit unit:V,
+                      unit:KiloV,
+                      unit:MegaV ;
+  rdfs:comment "Line-to-neutral voltage measurement for output power." .
+
+dcpm:OutputVoltageL2N a owl:Class ;
+  rdfs:label "Output Voltage L2-N (V)" ;
+  rdfs:subClassOf dcpm:OutputVoltageLN ;
+  qudt:quantityKind quantityKind:Voltage ;
+  qudt:applicableUnit unit:V,
+                      unit:KiloV,
+                      unit:MegaV ;
+  rdfs:comment "Line-to-neutral voltage measurement for output power." .
+
+dcpm:OutputVoltageL3N a owl:Class ;
+  rdfs:label "Output Voltage L3-N (V)" ;
+  rdfs:subClassOf dcpm:OutputVoltageLN ;
+  qudt:quantityKind quantityKind:Voltage ;
+  qudt:applicableUnit unit:V,
+                      unit:KiloV,
+                      unit:MegaV ;
+  rdfs:comment "Line-to-neutral voltage measurement for output power." .
+
+dcpm:DCVoltage a owl:Class ;
+  rdfs:label "DC Voltage (V)" ;
+  rdfs:subClassOf dcpm:Voltage ;
+  qudt:quantityKind quantityKind:Voltage ;
+  qudt:applicableUnit unit:V,
+                      unit:KiloV,
+                      unit:MegaV .
+
+dcpm:Frequency a owl:Class ;
+  rdfs:label "Frequency (Hz)" ;
+  rdfs:subClassOf dcpm:TelemetryPoint ;
+  qudt:quantityKind quantityKind:Frequency ;
+  qudt:applicableUnit unit:HZ,
+                      unit:KiloHZ,
+                      unit:MegaHZ,
+                      unit:GigaHZ .
+
+dcpm:HarmonicsI a owl:Class ;
+  rdfs:subClassOf dcpm:TelemetryPoint ;
+  qudt:quantityKind quantityKind:DimensionlessRatio ;
+  qudt:applicableUnit unit:PERCENT ;
+  rdfs:label "Current Harmonics [1..n]" .
+
+dcpm:HarmonicsV a owl:Class ;
+  rdfs:subClassOf dcpm:TelemetryPoint ;
+  qudt:quantityKind quantityKind:VoltageRatio ;
+  qudt:applicableUnit unit:PERCENT ;
+  rdfs:label "Voltage Harmonics [1..n]" .
+
+dcpm:PowerFactor a owl:Class ;
+  rdfs:label "Power Factor" ;
+  rdfs:subClassOf dcpm:TelemetryPoint ;
+  qudt:quantityKind quantityKind:PowerFactor ;
+  qudt:applicableUnit unit:UNITLESS .
+
+dcpm:ReactivePower a owl:Class ;
+  rdfs:label "Reactive Power (kVAR)" ;
+  rdfs:subClassOf dcpm:TelemetryPoint ;
+  qudt:quantityKind quantityKind:ReactivePower ;
+  qudt:applicableUnit unit:KiloVAR,
+                      unit:MegaVAR,
+                      unit:VAR .
+
+dcpm:RemainingTime a owl:Class ;
+  rdfs:label "Remaining Time (minutes)" ;
+  rdfs:subClassOf dcpm:TelemetryPoint ;
+  qudt:quantityKind quantityKind:Time ;
+  qudt:applicableUnit unit:MIN,
+                      unit:HR,
+                      unit:DAY,
+                      unit:SEC .
+
+dcpm:SoC a owl:Class ;
+  rdfs:label "State of Charge (%)" ;
+  rdfs:subClassOf dcpm:TelemetryPoint ;
+  qudt:quantityKind quantityKind:StateOfCharge ;
+  qudt:applicableUnit unit:PERCENT .
+
+dcpm:SoH a owl:Class ;
+  rdfs:label "State of Health (%)" ;
+  rdfs:subClassOf dcpm:TelemetryPoint ;
+  qudt:applicableUnit unit:PERCENT .
+
+dcpm:MinSOC a owl:Class ;
+  rdfs:label "Minimum State of Charge (%)" ;
+  rdfs:subClassOf dcpm:SoC ;
+  qudt:quantityKind quantityKind:StateOfCharge ;
+  qudt:applicableUnit unit:PERCENT ;
+  rdfs:comment "Minimum allowable state of charge threshold." .
+
+dcpm:MaxSOC a owl:Class ;
+  rdfs:label "Maximum State of Charge (%)" ;
+  rdfs:subClassOf dcpm:SoC ;
+  qudt:quantityKind quantityKind:StateOfCharge ;
+  qudt:applicableUnit unit:PERCENT ;
+  rdfs:comment "Maximum allowable state of charge threshold." .
+
+dcpm:EnergyAvailable a owl:Class ;
+  rdfs:label "Available Energy (kWh)" ;
+  rdfs:subClassOf dcpm:TelemetryPoint ;
+  qudt:quantityKind quantityKind:Energy ;
+  qudt:applicableUnit unit:KiloW-HR,
+                      unit:MegaW-HR,
+                      unit:W-HR ;
+  rdfs:comment "Amount of energy currently available for discharge from storage system." .
+
+dcpm:ChargeEfficiency a owl:Class ;
+  rdfs:label "Charge Efficiency" ;
+  rdfs:subClassOf dcpm:TelemetryPoint ;
+  qudt:applicableUnit unit:UNITLESS ;
+  rdfs:comment "Efficiency ratio during battery charging operation." .
+
+dcpm:DischargeEfficiency a owl:Class ;
+  rdfs:label "Discharge Efficiency" ;
+  rdfs:subClassOf dcpm:TelemetryPoint ;
+  qudt:applicableUnit unit:UNITLESS ;
+  rdfs:comment "Efficiency ratio during battery discharging operation." .
+
+dcpm:THDI a owl:Class ;
+  rdfs:label "Total Harmonic Distortion of Current (%)" ;
+  rdfs:subClassOf dcpm:TelemetryPoint ;
+  qudt:applicableUnit unit:PERCENT .
+
+dcpm:THDV a owl:Class ;
+  rdfs:label "Total Harmonic Distortion of Voltage (%)" ;
+  rdfs:subClassOf dcpm:TelemetryPoint ;
+  qudt:applicableUnit unit:PERCENT .
+
+dcpm:Temperature a owl:Class ;
+  rdfs:label "Temperature" ;
+  owl:equivalentClass brick:Temperature ;
+  rdfs:subClassOf dcpm:TelemetryPoint ;
+  qudt:quantityKind quantityKind:Temperature ;
+  qudt:applicableUnit unit:DEG_C,
+                      unit:DEG_F,
+                      unit:K .
+
+dcpm:CellTemperature a owl:Class ;
+  rdfs:label "Battery Cell Temperature" ;
+  rdfs:subClassOf dcpm:Temperature ;
+  qudt:quantityKind quantityKind:Temperature ;
+  qudt:applicableUnit unit:DEG_C,
+                      unit:DEG_F,
+                      unit:K ;
+  rdfs:comment "Temperature measurement of individual battery cells." .
+
+dcpm:EngineCoolantTemperature a owl:Class ;
+  rdfs:label "Engine Coolant Temperature" ;
+  rdfs:subClassOf dcpm:Temperature ;
+  qudt:quantityKind quantityKind:Temperature ;
+  qudt:applicableUnit unit:DEG_C,
+                      unit:DEG_F,
+                      unit:K ;
+  rdfs:comment "Temperature of generator engine coolant." .
+
+dcpm:Humidity a owl:Class ;
+  rdfs:label "Humidity (%RH)" ;
+  rdfs:subClassOf dcpm:TelemetryPoint ;
+  qudt:quantityKind quantityKind:RelativeHumidity ;
+  qudt:applicableUnit unit:PERCENT_RH .
+
+dcpm:PrimaryKV a owl:Class ;
+  rdfs:label "Primary Voltage" ;
+  rdfs:subClassOf dcpm:Voltage ;  
+  qudt:quantityKind quantityKind:Voltage ;
+  qudt:applicableUnit unit:KiloV,
+                      unit:MegaV,
+                      unit:V .
+
+dcpm:SecondaryKV a owl:Class ;
+  rdfs:label "Secondary Voltage" ;
+  rdfs:subClassOf dcpm:Voltage ;
+  qudt:quantityKind quantityKind:Voltage ;
+  qudt:applicableUnit unit:KiloV,
+                      unit:MegaV,
+                      unit:V .
+
+dcpm:PercentZ a owl:Class ;
+  rdfs:label "Impedance (%Z)" ;
+  rdfs:subClassOf dcpm:TelemetryPoint ;
+  qudt:quantityKind quantityKind:DimensionlessRatio ;
+  qudt:applicableUnit unit:PERCENT ;
+  rdfs:comment "Percentage impedance of a transformer, representing the per-unit impedance referred to its rated voltage and current." .
+
+dcpm:EngineRPM a owl:Class ;
+  rdfs:label "Engine RPM (rev/min)" ;
+  rdfs:subClassOf dcpm:TelemetryPoint ;
+  qudt:quantityKind quantityKind:RotationalFrequency ;
+  qudt:applicableUnit unit:REV-PER-MIN ;
+  rdfs:comment "Rotational speed of generator engine." .
+
+dcpm:EngineOilPressure a owl:Class ;
+  rdfs:label "Engine Oil Pressure (PSI)" ;
+  rdfs:subClassOf dcpm:TelemetryPoint ;
+  qudt:quantityKind quantityKind:ForcePerArea ;
+  qudt:applicableUnit unit:PSI ;
+  rdfs:comment "Oil pressure in generator engine lubrication system." .
+
+dcpm:FuelLevel a owl:Class ;
+  rdfs:label "Fuel Level (%)" ;
+  rdfs:subClassOf dcpm:TelemetryPoint ;
+  qudt:quantityKind quantityKind:DimensionlessRatio ;
+  qudt:applicableUnit unit:PERCENT ;
+  rdfs:comment "Fuel tank level as percentage of capacity." .
+
+dcpm:LoadingPercentage a owl:Class ;
+  rdfs:label "Loading Percentage (%)" ;
+  rdfs:subClassOf dcpm:TelemetryPoint ;
+  qudt:quantityKind quantityKind:DimensionlessRatio ;
+  qudt:applicableUnit unit:PERCENT ;
+  rdfs:comment "Equipment loading as percentage of rated capacity." .
+
+dcpm:ATSTransferCount a owl:Class ;
+  rdfs:label "ATS Transfer Count" ;
+  rdfs:subClassOf dcpm:TelemetryPoint ;
+  qudt:quantityKind quantityKind:Count ;
+  qudt:applicableUnit unit:COUNT ;
+  rdfs:comment "Cumulative count of transfer operations performed by an Automatic Transfer Switch." .
+
+# ========================================
+# Rated Properties for PowerDeviceType
+# ========================================
+dcpm:ratedPower a owl:ObjectProperty ;
+    rdfs:domain dcpm:PowerDeviceType ;
+    rdfs:range dcpm:ActivePower ;
+    rdfs:label "Rated Active Power" ;
+    rdfs:comment "Nominal rated active power capacity of the device." .
+
+dcpm:ratedVoltage a owl:ObjectProperty ;
+    rdfs:domain dcpm:PowerDeviceType ;
+    rdfs:range dcpm:Voltage ;
+    rdfs:label "Rated Voltage" ;
+    rdfs:comment "Nominal rated operating voltage of the device." .
+
+dcpm:ratedCurrent a owl:ObjectProperty ;
+    rdfs:domain dcpm:PowerDeviceType ;
+    rdfs:range dcpm:Current ;
+    rdfs:label "Rated Current" ;
+    rdfs:comment "Nominal rated operating current of the device." .
+
+dcpm:ratedStorageCapacity a owl:ObjectProperty ;
+    rdfs:domain dcpm:BESSType ;
+    rdfs:range dcpm:EnergyAvailable ;
+    rdfs:label "Rated Storage Capacity" ;
+    rdfs:comment "Nominal energy storage capacity of battery energy storage system." .
+
+# ===========================
+# Electrical Context Classes
+# ===========================
+dcpm:Phase a owl:Class ;
+    rdfs:label "Electrical Phase" ;
+    rdfs:comment "Represents an electrical phase identifier (e.g., L1, L2, L3, N, LL, LN) for polyphase systems." .
+
+dcpm:Phase_L1 a dcpm:Phase ; rdfs:label "Phase L1" .
+dcpm:Phase_L2 a dcpm:Phase ; rdfs:label "Phase L2" .
+dcpm:Phase_L3 a dcpm:Phase ; rdfs:label "Phase L3" .
+dcpm:Phase_LN a dcpm:Phase ; rdfs:label "Line-to-Neutral" .
+dcpm:Phase_LL a dcpm:Phase ; rdfs:label "Line-to-Line" .
+
+# ===========================
+# Object Properties 
+# ===========================
+dcpm:containsEquipment a owl:ObjectProperty ;
+  rdfs:label "Contains Equipment" .
+
+dcpm:hasLocation a owl:ObjectProperty ;
+  owl:equivalentProperty brick:hasLocation ;
+  owl:inverseOf dcpm:isLocationOf ;
+  rdfs:label "Has Location" ;
+  rdfs:comment "Subject is physically located in the location given by the object" .
+
+dcpm:isLocationOf a owl:ObjectProperty ;
+  owl:equivalentProperty brick:isLocationOf ;
+  owl:inverseOf dcpm:hasLocation ;
+  rdfs:label "Is Location Of" ;
+  rdfs:comment "Subject is a physical location that contains the object" .
+
+dcpm:fedBy a owl:ObjectProperty ;
+  owl:inverseOf dcpm:feeds ;
+  owl:equivalentProperty brick:isFedBy ;
+  rdfs:label "Fed By" .
+
+dcpm:feeds a owl:ObjectProperty ;
+  owl:inverseOf dcpm:fedBy ;
+  owl:equivalentProperty brick:feeds ;
+  rdfs:label "Feeds" .
+
+dcpm:suppliedBy a owl:ObjectProperty ;
+  owl:inverseOf dcpm:suppliesPowerTo ;
+  rdfs:label "Supplied By" .
+
+dcpm:suppliesPowerTo a owl:ObjectProperty ;
+  owl:inverseOf dcpm:suppliedBy ;
+  rdfs:label "Supplies Power To" .
+
+dcpm:hasTelemetryStream a owl:ObjectProperty ;
+  rdfs:label "Has Telemetry Stream" ;
+  rdfs:comment "Links a TelemetryStream to its contained TelemetryPoints" .
+
+dcpm:hasTelemetryPoint a owl:ObjectProperty ;
+  rdfs:label "Has Telemetry Point" ;
+  owl:equivalentProperty brick:hasPoint .
+
+dcpm:isTelemetryStreamOf a owl:ObjectProperty ;
+  rdfs:subPropertyOf brick:isPointOf ;
+  rdfs:label "Is Telemetry Stream Of" ;
+  rdfs:comment "Links a TelemetryStream to the device it belongs to" .
+
+dcpm:isTelemetryOf a owl:ObjectProperty ;
+  rdfs:subPropertyOf brick:isPointOf ;
+  rdfs:label "Is Telemetry Of" ;
+  rdfs:comment "Links a Telemetry to the device or telemetry stream it belongs to" .
+
+dcpm:protects a owl:ObjectProperty ;
+  owl:inverseOf dcpm:protectedBy ;
+  rdfs:label "Protects" ;
+  rdfs:comment "A directed reference pair indicating a protection relationship." .
+
+dcpm:protectedBy a owl:ObjectProperty ;
+  owl:inverseOf dcpm:protects ;
+  rdfs:label "ProtectedBy" ;
+  rdfs:comment "A directed reference pair indicating a protection relationship." .
+
+dcpm:connectedTo a owl:ObjectProperty ;
+  rdfs:label "ConnectedTo" ;
+  owl:equivalentProperty s223:connectedTo ;
+  owl:inverseOf dcpm:connectedFrom ;
+  rdfs:comment "A symmetric reference used for general, non-power-flow connections, such as data or communication links between two devices." .
+
+dcpm:connectedFrom a owl:ObjectProperty ;
+  rdfs:label "ConnectedFrom" ;
+  owl:equivalentProperty s223:connectedFrom ;
+  owl:inverseOf dcpm:connectedTo ;
+  rdfs:comment "A directed reference pair indicating a connection relationship." .
+
+dcpm:controls a owl:ObjectProperty ;
+  owl:inverseOf dcpm:controlledBy ;
+  rdfs:label "Controls" ;
+  rdfs:comment "A directed reference pair indicating a control relationship." .
+
+dcpm:controlledBy a owl:ObjectProperty ;
+  owl:inverseOf dcpm:controls ;
+  rdfs:label "ControlledBy" ;
+  rdfs:comment "A directed reference pair indicating a control relationship." .
+
+dcpm:hasSOP a owl:ObjectProperty ;
+  rdfs:label "Has SOP" ;
+  rdfs:comment "Power system or electric equipment associated with Standard Operating Procedures (SOPs)" .
+
+dcpm:hasPhase a owl:ObjectProperty ;
+    rdfs:label "Has Phase" ;
+    rdfs:comment "Associates a telemetry point or measurement with its electrical phase context." .
+
+dcpm:hasDocument a owl:ObjectProperty ;
+  rdfs:label "Has Document" ;
+  rdfs:comment "Associates a DeviceType instance with one or more documentation artifacts." .
+
+dcpm:hasPointOfInterconnection a owl:ObjectProperty ;
+  rdfs:label "Has Point of Interconnection" ;
+  rdfs:domain dcpm:SiteType ;
+  rdfs:range dcpm:PointOfInterconnection ;
+  rdfs:comment "Associates a SiteType instance with one or more Points of Interconnection (POIs) representing grid connections for settlement, demand, or value stream participation." .
+
+dcpm:hasValueStream a owl:ObjectProperty ;
+  rdfs:label "Has Value Stream" ;
+  rdfs:comment "Associates a SiteType, PowerDeviceType, or PointOfInterconnection instance with one or more value streams for optimization or program participation." .
+
+dcpm:primarySource a owl:ObjectProperty ;
+  rdfs:label "Primary Source" ;
+  rdfs:comment "Primary source of power for a device, used for energy." .
+
+dcpm:backupSource a owl:ObjectProperty ;
+  rdfs:label "Backup Source" ;
+  rdfs:comment "Backup source of power for a device, used for energy." .
+
+# ======================================== 
+# Enumeration Type
+# ========================================
+dcpm:BreakerStateEnum a rdfs:Datatype ;
+    rdfs:label "Breaker State Enumeration" ;
+    owl:oneOf ( "Unknown" "Open" "Closed" "Tripped" "Intermediate" ) ;
+    rdfs:comment "0=Unknown, 1=Open, 2=Closed, 3=Tripped, 4=Intermediate" .
+
+dcpm:DeviceStateEnum a rdfs:Datatype ;
+    rdfs:label "Device State Enumeration" ;
+    owl:oneOf ( "Unknown" "Stopped" "Standby" "Running" "Faulted" "Maintenance" ) ;
+    rdfs:comment "0=Unknown, 1=Stopped, 2=Standby, 3=Running, 4=Faulted, 5=Maintenance" .
+
+dcpm:SourceEnum a rdfs:Datatype ;
+    rdfs:label "Source Enumeration" ;
+    owl:oneOf ( "Utility" "Generator" "UPS" "BESS" "Bypass" ) ;
+    rdfs:comment "0=Utility, 1=Generator, 2=UPS, 3=BESS, 4=Bypass" .
+
+dcpm:UPSModeEnum a rdfs:Datatype ;
+    rdfs:label "UPS Mode Enumeration" ;
+    owl:oneOf ( "Online" "OnBattery" "Eco" "Bypass" "Standby" "Fault" ) ;
+    rdfs:comment "0=Online, 1=OnBattery, 2=Eco, 3=Bypass, 4=Standby, 5=Fault" .
+
+dcpm:ATSModeEnum a rdfs:Datatype ;
+    rdfs:label "ATS Mode Enumeration" ;
+    owl:oneOf ( "Auto" "Manual" "Test" "LockedOut" ) ;
+    rdfs:comment "0=Auto, 1=Manual, 2=Test, 3=LockedOut" .
+
+dcpm:GenModeEnum a rdfs:Datatype ;
+    rdfs:label "Generator Mode Enumeration" ;
+    owl:oneOf ( "Ready" "Starting" "Running" "Testing" "Cooldown" "Stopped" "Fault" ) ;
+    rdfs:comment "0=Ready, 1=Starting, 2=Running, 3=Testing, 4=Cooldown, 5=Stopped, 6=Fault" .
+
+dcpm:BatteryChemistryEnum a rdfs:Datatype ;
+    rdfs:label "Battery Chemistry Enumeration" ;
+    owl:oneOf ( "LFP" "NMC" "NCA" "LeadAcid" "Other" ) ;
+    rdfs:comment "0=LFP (LiFePO4), 1=NMC, 2=NCA, 3=LeadAcid, 4=Other" .
+
+dcpm:ThyristorHealthEnum a rdfs:Datatype ;
+    rdfs:label "Thyristor Health Enumeration" ;
+    owl:oneOf ( "Good" "Fair" "Poor" ) ;
+    rdfs:comment "0=Good, 1=Fair, 2=Poor" .
+
+dcpm:MotorFeederStarterStateEnum a rdfs:Datatype ;
+    rdfs:label "Motor Feeder Starter State Enumeration" ;
+    owl:oneOf ( "Off" "Run" "Trip" ) ;
+    rdfs:comment "0=Off, 1=Run, 2=Trip" .
+
+dcpm:UPSAlarmStatusEnum a rdfs:Datatype ;
+    rdfs:label "UPS Alarm Status Enumeration" ;
+    owl:oneOf ( "Normal" "Warning" "Alarm" "Critical" ) ;
+    rdfs:comment "0=Normal, 1=Warning, 2=Alarm, 3=Critical" .
+
+dcpm:GenAlarmStatusEnum a rdfs:Datatype ;
+    rdfs:label "Generator Alarm Status Enumeration" ;
+    owl:oneOf ( "Normal" "Warning" "Alarm" "Critical" "Shutdown" ) ;
+    rdfs:comment "0=Normal, 1=Warning, 2=Alarm, 3=Critical, 4=Shutdown" .
+
+dcpm:BESSAlarmStatusEnum a rdfs:Datatype ;
+    rdfs:label "BESS Alarm Status Enumeration" ;
+    owl:oneOf ( "Normal" "Warning" "Alarm" "Critical" "Fault" ) ;
+    rdfs:comment "0=Normal, 1=Warning, 2=Alarm, 3=Critical, 4=Fault" .
+
+dcpm:ATSAlarmStatusEnum a rdfs:Datatype ;
+    rdfs:label "ATS Alarm Status Enumeration" ;
+    owl:oneOf ( "Normal" "Warning" "Alarm" "Critical" ) ;
+    rdfs:comment "0=Normal, 1=Warning, 2=Alarm, 3=Critical" .
+
+dcpm:BreakerTripCauseEnum a rdfs:Datatype ;
+    rdfs:label "Breaker Trip Cause Enumeration" ;
+    owl:oneOf ( "None" "Overload" "ShortCircuit" "GroundFault" "Undervoltage" "Overvoltage" "Manual" "Other" ) ;
+    rdfs:comment "0=None, 1=Overload, 2=ShortCircuit, 3=GroundFault, 4=Undervoltage, 5=Overvoltage, 6=Manual, 7=Other" .
+
+dcpm:ValueStreamProgramEnum a rdfs:Datatype ;
+    rdfs:label "Value Stream Program Enumeration" ;
+    owl:oneOf (
+        "Tariff Based Energy Arbitrage"
+        "Tariff Based Demand Charge Management"
+        "MA Clean Peak"
+        "SGIP"
+        "ITC"
+    ) ;
+    rdfs:comment "0=Tariff Based Energy Arbitrage, 1=Tariff Based Demand Charge Management, 2=MA Clean Peak, 3=SGIP, 4=ITC" .
+
+dcpm:BusinessSegmentEnum a rdfs:Datatype ;
+    rdfs:label "Business Segment Enumeration" ;
+    owl:equivalentClass [
+        rdf:type rdfs:Datatype ;
+        owl:oneOf ( "Hyperscale" "Colocation" "Enterprise" "Edge" )
+    ] ;
+    rdfs:comment "0=Hyperscale, 1=Colocation, 2=Enterprise, 3=Edge" .
+
+# ======================================== 
+# DOCUMENT TYPE CLASSES
+# ========================================
+
+dcpm:UserManual a owl:Class ;
+    rdfs:subClassOf dcpm:Document ;
+    rdfs:label "User Manual" .
+
+dcpm:InstallationGuide a owl:Class ;
+    rdfs:subClassOf dcpm:Document ;
+    rdfs:label "Installation Guide" .
+
+dcpm:TechnicalSpecifications a owl:Class ;
+    rdfs:subClassOf dcpm:Document ;
+    rdfs:label "Technical Specifications" .
+
+dcpm:WiringDiagram a owl:Class ;
+    rdfs:subClassOf dcpm:Document ;
+    rdfs:label "Wiring Diagram" .
+
+dcpm:CommunicationProtocolDoc a owl:Class ;
+    rdfs:subClassOf dcpm:Document ;
+    rdfs:label "Communication Protocol Definition" .
+
+dcpm:ModbusMap a owl:Class ;
+    rdfs:subClassOf dcpm:Document ;
+    rdfs:label "Modbus Register Map" .
+
+dcpm:BACnetObjects a owl:Class ;
+    rdfs:subClassOf dcpm:Document ;
+    rdfs:label "BACnet Object Model" .
+
+dcpm:OPCUAModel a owl:Class ;
+    rdfs:subClassOf dcpm:Document ;
+    rdfs:label "OPC UA Companion Model" .
+
+dcpm:MaintenanceSchedule a owl:Class ;
+    rdfs:subClassOf dcpm:Document ;
+    rdfs:label "Maintenance Schedule" .
+
+dcpm:MaintenanceHistory a owl:Class ;
+    rdfs:subClassOf dcpm:Document ;
+    rdfs:label "Maintenance History" .
+
+dcpm:FirmwarePackage a owl:Class ;
+    rdfs:subClassOf dcpm:Document ;
+    rdfs:label "Firmware or Software Package" .
+
+
+# ========================================
+# DOCUMENT METADATA PROPERTIES
+# ========================================
+
+dcpm:documentUrl a owl:DatatypeProperty ;
+    rdfs:subPropertyOf dcpm:url ;
+    rdfs:label "Document URL" ;
+    rdfs:domain dcpm:Document ;
+    rdfs:range xsd:anyURI .
+
+dcpm:documentFileName a owl:DatatypeProperty ;
+    rdfs:label "Document File Name" ;
+    rdfs:domain dcpm:Document ;
+    rdfs:range xsd:string .
+
+dcpm:documentVersion a owl:DatatypeProperty ;
+    rdfs:label "Document Version" ;
+    rdfs:domain dcpm:Document ;
+    rdfs:range xsd:string .
+
+
+# ========================================
+# SHACL SHAPES
+# ========================================
+
+# 1. Common Device Shape (dcpm:PowerDeviceType)
+
+dcpm:PowerDeviceCommonShape a sh:NodeShape ;
+    sh:targetClass dcpm:PowerDeviceType ;
+    sh:name "Power Device Common Shape" ;
+    # Mandatory Properties
+    sh:property [
+        sh:path dcpm:manufacturer ;
+        sh:minCount 1 ;
+        sh:datatype xsd:string ;
+        sh:name "Manufacturer" ;
+        sh:description "Manufacturer of the power device is mandatory."
+    ] ;
+    sh:property [
+        sh:path dcpm:model ;
+        sh:minCount 1 ;
+        sh:datatype xsd:string ;
+        sh:name "Model" ;
+        sh:description "Model name is mandatory."
+    ] ;
+    sh:property [
+        sh:path dcpm:serialNumber ;
+        sh:datatype xsd:string ;
+        sh:name "Serial Number" ;
+        sh:description "Serial number assigned by the manufacturer (Optional)."
+    ] ;
+    sh:property [
+        sh:path dcpm:assetId ;
+        sh:minCount 1 ;
+        sh:datatype xsd:string ;
+        sh:name "Asset ID" ;
+        sh:description "Unique internal asset identifier is mandatory."
+    ] ;
+    # Optional Properties
+    sh:property [
+        sh:path dcpm:hasSOP ;
+        sh:class dcpm:SOP ;
+        sh:name "SOP" ;
+        sh:description "Standard Operating Procedure documentation (Optional)."
+    ] ;
+    sh:property [
+        sh:path dcpm:hasDocument ;
+        sh:class dcpm:Document ;
+        sh:name "General Document" ;
+        sh:description "Associated technical documentation (Optional)."
+    ] .
+

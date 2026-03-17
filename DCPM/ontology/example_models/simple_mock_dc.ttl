@@ -1,0 +1,774 @@
+@prefix simple_dc: <urn:com.qcells.ces:simple_dc_001#> .
+@prefix dcpm: <https://qcells.com/schema/dcpm#> .
+@prefix dcpm_brick: <http://qcells.io/ontologies/DCPM_Brick_Extension#> .
+@prefix brick: <https://brickschema.org/schema/Brick#> .
+@prefix s223: <http://data.ashrae.org/standard223#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rec: <https://w3id.org/rec#> .
+
+## Modeling practices for values:
+# a few things are rdf literals - mostly fractional values
+# if it's a parameter of a point that we get to with hasParameter, it'll point at a named node with a value and a unit property
+# if it's a property that we directly address, e.g. ratedPowerInput, then it'll have a blank node with value and unit properties
+# in both cases they're "value nodes" and you can look into them to get a value property and a unit property
+# this is mostly from some weird early brick decisions on point parameters that they still haven't sorted out
+# my comments in the github issue in the brick repo is to use hasParameter so we're using my opinion in this model :)
+
+dcpm_brick:GraphValidationAnchor a rdf:Resource .
+
+simple_dc:data_center a dcpm:SiteType ;
+    rdfs:label "Simple Example Data Center" ;
+    dcpm:siteId "simple-dc-001" ;
+    rec:ownedBy simple_dc:acme-corp ;
+    rec:address [
+        a rec:PostalAddress ;
+        rec:addressLine1 "1541 Commodore Drive" ;
+        rec:city "Beverly Hills" ;
+        rec:postalCode "90210"
+    ] ;
+    brick:yearBuilt "2020"^^xsd:gYear ;
+    dcpm:latitude "34.0731"^^xsd:float ;
+    dcpm:longitude "-118.4016"^^xsd:float ;
+    dcpm:hasPointOfInterconnection simple_dc:poi-a ;
+    rec:isLocationOf simple_dc:utility-feeder-1,
+                     simple_dc:xfmr-1,
+                     simple_dc:switchgear-1,
+                     simple_dc:ups-1,
+                     simple_dc:pdu-1,
+                     simple_dc:rack-pdu-1,
+                     simple_dc:it-rack-1,
+                     simple_dc:bess-1,
+                     simple_dc:chiller-1,
+                     simple_dc:condenser-water-pump-1,
+                     simple_dc:cooling-tower-1,
+                     simple_dc:ahu-1,
+                     simple_dc:chw-pump-1,
+                     simple_dc:hvac-zone-1 .
+
+simple_dc:acme-corp a rec:Organization ;
+    rdfs:label "Acme Corporation" ;
+    dcpm:preferredName "Acme Corp" ;
+    dcpm:legalEntityName "Acme Corporation International, Inc." ;
+    dcpm:timeZone "America/Los_Angeles" ;
+    rec:address [
+        a rec:PostalAddress ;
+        rec:addressLine1 "100 Main Street" ;
+        rec:city "San Francisco" ;
+        rec:postalCode "94105" ;
+        rec:country "US"
+    ] ;
+    dcpm:primaryBusinessSegment "Edge"^^dcpm:BusinessSegmentEnum ;
+    dcpm:url "https://www.acme-corp.com"^^xsd:anyURI .
+
+simple_dc:poi-a a dcpm:PointOfInterconnection ;
+    dcpm:suppliesPowerTo simple_dc:utility-feeder-1 .
+
+simple_dc:utility-feeder-1 a dcpm:UtilityMeterType ;
+    rdfs:label "Utility Feeder 1" ;
+    dcpm:manufacturer "Schneider Electric" ;
+    dcpm:model "ION9000" ;
+    dcpm:assetId "DC-UM-001" ;
+    dcpm:suppliesPowerTo simple_dc:switchgear-1 ;
+    dcpm:hasTelemetryPoint simple_dc:utility-feeder-1-import-active-power .
+
+simple_dc:utility-feeder-1-import-active-power a dcpm:ImportActivePower ;
+    rdfs:label "Utility Feeder 1 import active power" ;
+    brick:hasUnit unit:KiloW .
+
+simple_dc:xfmr-1 a dcpm:TransformerType ;
+    rdfs:label "Transformer-1" ;
+    dcpm:manufacturer "Schneider Electric" ;
+    dcpm:model "Trihal Cast Resin" ;
+    dcpm:assetId "DC-XFMR-001" ;
+    dcpm:suppliesPowerTo simple_dc:switchgear-1 ;
+    dcpm:hasTelemetryPoint simple_dc:xfmr-1-primary-voltage,
+                           simple_dc:xfmr-1-secondary-voltage,
+                           simple_dc:xfmr-1-active-power .
+
+simple_dc:xfmr-1-primary-voltage a dcpm:PrimaryKV ;
+    rdfs:label "xfmr-1-primary-voltage" ;
+    brick:hasUnit unit:KiloV .
+simple_dc:xfmr-1-secondary-voltage a dcpm:SecondaryKV ;
+    rdfs:label "xfmr-1-secondary-voltage" ;
+    brick:hasUnit unit:KiloV .
+simple_dc:xfmr-1-active-power a dcpm:ActivePower ;
+    rdfs:label "xfmr-1-active-power" ;
+    brick:hasUnit unit:KiloW .
+
+simple_dc:generator-1 a dcpm:GeneratorSetType ;
+    rdfs:label "Generator-1" ;
+    dcpm:manufacturer "Caterpillar" ;
+    dcpm:model "C175-20" ;
+    dcpm:assetId "DC-GEN-001" ;
+    dcpm:suppliesPowerTo simple_dc:switchgear-1 ;
+    dcpm:hasTelemetryPoint simple_dc:generator-1-output-active-power,
+                           simple_dc:generator-1-output-voltage-ll,
+                           simple_dc:generator-1-frequency,
+                           simple_dc:generator-1-fuel-level.
+
+simple_dc:generator-1-output-active-power a dcpm:ExportActivePower ;
+    rdfs:label "generator-1-output-active-power" ;
+    brick:hasUnit unit:KiloW .
+simple_dc:generator-1-output-voltage-ll a dcpm:OutputVoltageLL ;
+    rdfs:label "generator-1-output-voltage-ll" ;
+    brick:hasUnit unit:KiloV .
+simple_dc:generator-1-frequency a dcpm:Frequency ;
+    rdfs:label "generator-1-frequency" ;
+    brick:hasUnit unit:HZ .
+simple_dc:generator-1-fuel-level a dcpm:FuelLevel ;
+    rdfs:label "generator-1-fuel-level" ;
+    brick:hasUnit unit:PERCENT .
+
+simple_dc:switchgear-1 a dcpm:SwitchgearType ;
+    rdfs:label "Switchgear-1" ;
+    dcpm:manufacturer "ABB" ;
+    dcpm:model "MNS Digital" ;
+    dcpm:assetId "DC-SWG-001" ;
+    dcpm:suppliesPowerTo simple_dc:chiller-1,
+                         simple_dc:cooling-tower-1-fan,
+                         simple_dc:ahu-1-return-fan,
+                         simple_dc:ahu-1-supply-fan,
+                         simple_dc:chw-pump-1,
+                         simple_dc:condenser-water-pump-1,
+                         simple_dc:bess-1,
+                         simple_dc:ups-1 ;
+    dcpm:suppliedBy simple_dc:xfmr-1,
+                    simple_dc:generator-1,
+                    simple_dc:bess-1 ;
+    dcpm:ratedVoltage [
+        brick:value "480"^^xsd:decimal ;
+        brick:hasUnit unit:V
+    ] ;
+    dcpm:hasTelemetryPoint simple_dc:switchgear-1-bus-active-power,
+                           simple_dc:switchgear-1-bus-apparent-power,
+                           simple_dc:switchgear-1-bus-voltage,
+                           simple_dc:switchgear-1-bus-frequency .
+
+simple_dc:switchgear-1-bus-active-power a dcpm:ActivePower ;
+    rdfs:label "switchgear-1-bus-active-power" ;
+    brick:hasUnit unit:KiloW .
+simple_dc:switchgear-1-bus-apparent-power a dcpm:ApparentPower ;
+    rdfs:label "switchgear-1-bus-apparent-power" ;
+    brick:hasUnit unit:KiloVA .
+simple_dc:switchgear-1-bus-voltage a dcpm:Voltage ;
+    rdfs:label "switchgear-1-bus-voltage" ;
+    brick:hasUnit unit:V .
+simple_dc:switchgear-1-bus-frequency a dcpm:Frequency ;
+    rdfs:label "switchgear-1-bus-frequency" ;
+    brick:hasUnit unit:HZ .
+
+
+simple_dc:chiller-1 a brick:Chiller ;
+    rdfs:label "Chiller-1" ;
+    brick:coolingCapacity [
+        brick:value "3517000"^^xsd:decimal ;
+        brick:hasUnit unit:W
+    ] ;
+
+    dcpm_brick:minimumPartLoadRatio "0.1"^^xsd:decimal ;
+    
+    brick:hasPoint simple_dc:chiller-1-chwst-sensor,
+                   simple_dc:chiller-1-chwrt-sensor,
+                   simple_dc:chiller-1-ecwt-sensor,
+                   simple_dc:chiller-1-chw-flow-sensor,
+                   simple_dc:chiller-1-power-sensor,
+                   simple_dc:chiller-1-cooling-load-sensor,
+                   simple_dc:chiller-1-cop-sensor,
+                   simple_dc:chiller-1-chwst-setpoint,
+                   simple_dc:chiller-1-chw-flow-setpoint,
+                   simple_dc:chiller-1-onoff-command ;
+    brick:feeds simple_dc:chw-pump-1 ;
+    brick:feeds simple_dc:cooling-tower-1 ;
+    brick:isFedBy simple_dc:condenser-water-pump-1 ;
+    brick:isFedBy simple_dc:ahu-1.
+
+simple_dc:chiller-1-chwst-sensor a brick:Chilled_Water_Supply_Temperature_Sensor ;
+    rdfs:label "chiller-1-chwst-sensor" ;
+    brick:hasUnit unit:DEG_C .
+
+simple_dc:chiller-1-chwrt-sensor a brick:Chilled_Water_Return_Temperature_Sensor ;
+    rdfs:label "chiller-1-chwrt-sensor" ;
+    brick:hasUnit unit:DEG_C .
+
+simple_dc:chiller-1-ecwt-sensor a brick:Entering_Condenser_Water_Temperature_Sensor ;
+    rdfs:label "chiller-1-ecwt-sensor" ;
+    brick:hasUnit unit:DEG_C .
+
+simple_dc:chiller-1-chw-flow-sensor a brick:Chilled_Water_Flow_Sensor ;
+    rdfs:label "chiller-1-chw-flow-sensor" ;
+    brick:hasUnit unit:KiloGM-PER-SEC .
+
+simple_dc:chiller-1-power-sensor a brick:Electric_Power_Sensor ;
+    rdfs:label "chiller-1-power-sensor" ;
+    brick:hasUnit unit:KiloW .
+
+simple_dc:chiller-1-cooling-load-sensor a dcpm_brick:Cooling_Thermal_Power_Sensor ;
+    rdfs:label "chiller-1-cooling-load-sensor" ;
+    brick:hasUnit unit:KiloW .
+
+simple_dc:chiller-1-cop-sensor a dcpm_brick:Coefficient_Of_Performance_Sensor ;
+    rdfs:label "chiller-1-cop-sensor" ;
+    brick:hasUnit unit:UNITLESS .
+
+simple_dc:chiller-1-chwst-setpoint a brick:Supply_Chilled_Water_Temperature_Setpoint ;
+    rdfs:label "chiller-1-chwst-setpoint" ;
+    dcpm_brick:hasParameter simple_dc:chiller-1-chwst-min-limit,
+                           simple_dc:chiller-1-chwst-max-limit,
+                           simple_dc:chiller-1-chwst-max-ramp-rate ;
+    brick:hasUnit unit:DEG_C .
+
+simple_dc:chiller-1-chw-flow-setpoint a brick:Chilled_Water_Flow_Setpoint ;
+    rdfs:label "chiller-1-chw-flow-setpoint" ;
+    dcpm_brick:hasParameter simple_dc:chiller-1-chw-flow-min-limit,
+                           simple_dc:chiller-1-chw-flow-max-limit ;
+    brick:hasUnit unit:KiloGM-PER-SEC .
+
+simple_dc:chiller-1-onoff-command a brick:On_Off_Command ;
+    rdfs:label "chiller-1-onoff-command" .
+
+# TODO - we're going to set these to static values but they in theory could be telemetry so we should review this in the future
+simple_dc:chiller-1-chwst-min-limit a brick:Min_Temperature_Setpoint_Limit ;
+    brick:value "5"^^xsd:decimal ;
+    brick:hasUnit unit:DEG_C .
+
+simple_dc:chiller-1-chwst-max-limit a brick:Max_Temperature_Setpoint_Limit ;
+    brick:value "12"^^xsd:decimal ;
+    brick:hasUnit unit:DEG_C .
+
+simple_dc:chiller-1-chwst-max-ramp-rate a dcpm_brick:Max_Supply_Water_Temperature_Ramp_Rate ;
+    brick:value "2"^^xsd:decimal ;
+    brick:hasUnit unit:DEG_C-PER-MIN .
+
+simple_dc:chiller-1-chw-flow-min-limit a dcpm_brick:Min_Water_Flow_Setpoint_Limit .
+
+simple_dc:chiller-1-chw-flow-max-limit a dcpm_brick:Max_Water_Flow_Setpoint_Limit .
+
+### 1.5 Chilled Water Pump
+
+simple_dc:chw-pump-1 a brick:Chilled_Water_Pump ;
+    rdfs:label "Chilled-Water-Pump-1" ;
+    brick:feeds simple_dc:ahu-1 ;
+    brick:hasPoint simple_dc:chiller-1-pump-flow-sensor ;
+    brick:hasPoint simple_dc:chiller-1-pump-power-sensor ;
+
+    ## Bug in brick - ratedPowerInput does not actually validate its numbers so easy to make mistakes here.
+    brick:ratedPowerInput [
+        brick:value "5"^^xsd:decimal ;
+        brick:hasUnit unit:KiloW
+    ] ;
+
+    dcpm_brick:ratedWaterFlowCapacity [
+        brick:value "150"^^xsd:decimal ;
+        brick:hasUnit unit:KiloGM-PER-SEC
+    ] ;
+
+    dcpm_brick:minimumFlowFraction "0.1"^^xsd:decimal .
+
+simple_dc:chiller-1-pump-flow-sensor a brick:Chilled_Water_Pump_Flow_Sensor ;
+    rdfs:label "chiller-1-pump-flow-sensor" ;
+    brick:hasUnit unit:GAL_US_PER_MIN .
+
+simple_dc:chiller-1-pump-power-sensor a brick:Electric_Power_Sensor ;
+    rdfs:label "chiller-1-pump-power-sensor" ;
+    brick:hasUnit unit:KiloW .
+
+### 2.0 Cooling Tower
+
+simple_dc:cooling-tower-1 a brick:Cooling_Tower ;
+    rdfs:label "Cooling-Tower-1" ;
+    brick:feeds simple_dc:condenser-water-pump-1 ;
+    brick:isFedBy simple_dc:chiller-1 ;
+    brick:hasPoint simple_dc:cooling-tower-1-lcw-temp-sensor,
+                   simple_dc:cooling-tower-1-approach-temp-sensor,
+                   simple_dc:cooling-tower-1-cw-flow-sensor,
+                   simple_dc:cooling-tower-1-lcw-temp-setpoint,
+                   simple_dc:cooling-tower-1-cw-flow-setpoint ;
+    brick:hasPart simple_dc:cooling-tower-1-fan .
+
+simple_dc:cooling-tower-1-lcw-temp-sensor a brick:Leaving_Condenser_Water_Temperature_Sensor ;
+    rdfs:label "cooling-tower-1-lcw-temp-sensor" ;
+    brick:hasUnit unit:DEG_C .
+
+simple_dc:cooling-tower-1-approach-temp-sensor a dcpm_brick:Condenser_Water_Approach_Temperature_Sensor ;
+    rdfs:label "cooling-tower-1-approach-temp-sensor" ;
+    brick:hasUnit unit:DEG_C .
+
+simple_dc:cooling-tower-1-cw-flow-sensor a brick:Condenser_Water_Flow_Sensor ;
+    rdfs:label "cooling-tower-1-cw-flow-sensor" ;
+    brick:hasUnit unit:GAL_US_PER_MIN .
+
+simple_dc:cooling-tower-1-lcw-temp-setpoint a brick:Leaving_Condenser_Water_Temperature_Setpoint ;
+    rdfs:label "cooling-tower-1-lcw-temp-setpoint" ;
+    dcpm_brick:hasParameter simple_dc:cooling-tower-1-lcw-temp-min-limit,
+                           simple_dc:cooling-tower-1-lcw-temp-max-limit,
+                           simple_dc:cooling-tower-1-lcw-temp-max-ramp-rate,
+                           simple_dc:cooling-tower-1-min-approach-temp-limit ;
+    brick:hasUnit unit:DEG_C .
+
+simple_dc:cooling-tower-1-cw-flow-setpoint a brick:Condenser_Water_Flow_Setpoint ;
+    rdfs:label "cooling-tower-1-cw-flow-setpoint" ;
+    dcpm_brick:hasParameter simple_dc:cooling-tower-1-cw-flow-min-limit,
+                           simple_dc:cooling-tower-1-cw-flow-max-limit ;
+    brick:hasUnit unit:GAL_US_PER_MIN .
+
+### 2.5 Cooling Tower Fan - embedded in the Cooling tower
+### Brick has a specialized fan for cooling towers, but not for AHU fans
+simple_dc:cooling-tower-1-fan a brick:Cooling_Tower_Fan ;
+    rdfs:label "cooling-tower-1-fan" ;
+    brick:hasPoint simple_dc:cooling-tower-1-fan-power-sensor,
+                   simple_dc:cooling-tower-1-fan-speed-command ;
+
+    ## Bug in brick - ratedPowerInput does not actually validate its numbers so easy to make mistakes here.
+    brick:ratedPowerInput [
+        brick:value "5"^^xsd:decimal ;
+        brick:hasUnit unit:KiloW
+    ] ;
+
+    dcpm_brick:ratedAirFlowCapacity [
+        brick:value "50"^^xsd:decimal ;
+        brick:hasUnit unit:KiloGM-PER-SEC
+    ] ;
+
+    dcpm_brick:minimumFlowFraction "0.1"^^xsd:decimal .
+
+simple_dc:cooling-tower-1-fan-power-sensor a brick:Power_Sensor ;
+    rdfs:label "cooling-tower-1-fan-power-sensor" ;
+    brick:hasUnit unit:KiloW .
+
+simple_dc:cooling-tower-1-fan-speed-command a brick:Fan_Speed_Command ;
+    rdfs:label "cooling-tower-1-fan-speed-command" .
+
+### points and params for the cooling tower and cooling tower fan
+simple_dc:cooling-tower-1-lcw-temp-min-limit a brick:Min_Temperature_Setpoint_Limit;
+    brick:value "18"^^xsd:decimal ;
+    brick:hasUnit unit:DEG_C .
+
+simple_dc:cooling-tower-1-lcw-temp-max-limit a brick:Max_Temperature_Setpoint_Limit ;
+    brick:value "35"^^xsd:decimal ;
+    brick:hasUnit unit:DEG_C .
+
+simple_dc:cooling-tower-1-lcw-temp-max-ramp-rate a dcpm_brick:Max_Supply_Water_Temperature_Ramp_Rate ;
+    brick:value "2"^^xsd:decimal ;
+    brick:hasUnit unit:DEG_C-PER-MIN .
+
+simple_dc:cooling-tower-1-min-approach-temp-limit a dcpm_brick:Min_Water_Approach_Temperature_Limit ;
+    brick:value "2.8"^^xsd:decimal ;
+    brick:hasUnit unit:DEG_C .
+
+simple_dc:cooling-tower-1-cw-flow-min-limit a dcpm_brick:Min_Water_Flow_Setpoint_Limit .
+
+simple_dc:cooling-tower-1-cw-flow-max-limit a dcpm_brick:Max_Water_Flow_Setpoint_Limit .
+### END COOLING TOWER ###
+
+
+####
+### 2.6 Condenser Water Pump
+####
+simple_dc:condenser-water-pump-1 a brick:Condenser_Water_Pump ;
+    rdfs:label "Condenser-Water-Pump-1" ;
+    brick:hasPoint simple_dc:condenser-water-pump-1-power-sensor ;
+    brick:feeds simple_dc:chiller-1 ;
+
+    ## Bug in brick - ratedPowerInput does not actually validate its numbers so easy to make mistakes here.
+    brick:ratedPowerInput [
+        brick:value "5"^^xsd:decimal ;
+        brick:hasUnit unit:KiloW
+    ] ;
+
+    dcpm_brick:ratedWaterFlowCapacity [
+        brick:value "150"^^xsd:decimal ;
+        brick:hasUnit unit:KiloGM-PER-SEC
+    ] ;
+
+    dcpm_brick:minimumFlowFraction "0.1"^^xsd:decimal .
+
+simple_dc:condenser-water-pump-1-power-sensor a brick:Electric_Power_Sensor ;
+    rdfs:label "condenser-water-pump-1-power-sensor" ;
+    brick:hasUnit unit:KiloW .
+
+### 3.0 Air Handling Unit
+simple_dc:ahu-1 a brick:AHU ;
+    rdfs:label "AHU-1" ;
+    brick:isFedBy simple_dc:chw-pump-1 ;
+    brick:feeds simple_dc:chiller-1 ;
+    brick:feeds simple_dc:cold-aisle-1 ;
+    # Brick/REC doesn't allow to Zone(hot-aisle-1) feeds Equipment(ahu-1), but let's keep this model for now and we can fix it later to model return path.
+    brick:isFedBy simple_dc:hot-aisle-1 ;
+    brick:hasPoint simple_dc:ahu-1-sat-sensor,
+                   simple_dc:ahu-1-rat-sensor,
+                   simple_dc:ahu-1-mat-sensor,
+                   simple_dc:ahu-1-oat-sensor,
+                   simple_dc:ahu-1-saf-sensor,
+                   simple_dc:ahu-1-cooling-load-sensor,
+                   simple_dc:ahu-1-sat-setpoint,
+                   simple_dc:ahu-1-mat-setpoint,
+                   simple_dc:ahu-1-saf-setpoint ;
+    brick:hasPart simple_dc:ahu-1-return-fan,
+                  simple_dc:ahu-1-supply-fan,
+                  simple_dc:ahu-1-outside-damper ,
+                  simple_dc:ahu-1-economizer .
+
+
+simple_dc:ahu-1-sat-sensor a brick:Supply_Air_Temperature_Sensor ;
+    rdfs:label "ahu-1-sat-sensor" ;
+    brick:hasUnit unit:DEG_C .
+
+simple_dc:ahu-1-rat-sensor a brick:Return_Air_Temperature_Sensor ;
+    rdfs:label "ahu-1-rat-sensor" ;
+    brick:hasUnit unit:DEG_C .
+
+simple_dc:ahu-1-mat-sensor a brick:Mixed_Air_Temperature_Sensor ;
+    rdfs:label "ahu-1-mat-sensor" ;
+    brick:hasUnit unit:DEG_C .
+
+simple_dc:ahu-1-oat-sensor a brick:Outside_Air_Temperature_Sensor ;
+    rdfs:label "ahu-1-oat-sensor" ;
+    brick:hasUnit unit:DEG_C .
+
+simple_dc:ahu-1-saf-sensor a brick:Supply_Air_Flow_Sensor ;
+    rdfs:label "ahu-1-saf-sensor" ;
+    brick:hasUnit unit:FT3-PER-MIN .
+
+simple_dc:ahu-1-cooling-load-sensor a dcpm_brick:Cooling_Thermal_Power_Sensor ;
+    rdfs:label "ahu-1-cooling-load-sensor" ;
+    brick:hasUnit unit:KiloW .
+
+simple_dc:ahu-1-sat-setpoint a brick:Supply_Air_Temperature_Setpoint ;
+    rdfs:label "ahu-1-sat-setpoint" ;
+    dcpm_brick:hasParameter simple_dc:ahu-1-sat-min-limit,
+                           simple_dc:ahu-1-sat-max-limit,
+                           simple_dc:ahu-1-sat-max-ramp-rate ;
+    brick:hasUnit unit:DEG_C .
+
+simple_dc:ahu-1-mat-setpoint a brick:Mixed_Air_Temperature_Setpoint ;
+    rdfs:label "ahu-1-mat-setpoint" ;
+    dcpm_brick:hasParameter simple_dc:ahu-1-mat-min-limit,
+                           simple_dc:ahu-1-mat-max-limit ;
+    brick:hasUnit unit:DEG_C .
+
+simple_dc:ahu-1-saf-setpoint a brick:Supply_Air_Flow_Setpoint ;
+    rdfs:label "ahu-1-saf-setpoint" ;
+    dcpm_brick:hasParameter simple_dc:ahu-1-saf-min-limit,
+                           simple_dc:ahu-1-saf-max-limit ;
+    brick:hasUnit unit:FT3-PER-MIN .
+
+# AHU Params 
+simple_dc:ahu-1-sat-min-limit a brick:Min_Supply_Air_Temperature_Setpoint_Limit ;
+    brick:value "12"^^xsd:decimal ;
+    brick:hasUnit unit:DEG_C .
+
+simple_dc:ahu-1-sat-max-limit a brick:Max_Supply_Air_Temperature_Setpoint_Limit ;
+    brick:value "20"^^xsd:decimal ;
+    brick:hasUnit unit:DEG_C .
+
+simple_dc:ahu-1-sat-max-ramp-rate a dcpm_brick:Max_Supply_Air_Temperature_Ramp_Rate ;
+    brick:value "2"^^xsd:decimal ;
+    brick:hasUnit unit:DEG_C-PER-MIN .
+
+simple_dc:ahu-1-saf-min-limit a brick:Min_Air_Flow_Setpoint_Limit .
+
+simple_dc:ahu-1-saf-max-limit a brick:Max_Air_Flow_Setpoint_Limit .
+
+simple_dc:ahu-1-mat-min-limit a brick:Min_Temperature_Setpoint_Limit ;
+    brick:value "10"^^xsd:decimal ;
+    brick:hasUnit unit:DEG_C .
+
+simple_dc:ahu-1-mat-max-limit a brick:Max_Temperature_Setpoint_Limit ;
+    brick:value "30"^^xsd:decimal ;
+    brick:hasUnit unit:DEG_C .
+
+
+## AHU Fan for return air from hot aisle
+simple_dc:ahu-1-return-fan a brick:Fan ;
+    rdfs:label "ahu-1-return-fan" ;
+    brick:hasPoint simple_dc:ahu-1-return-fan-power-sensor ;
+    brick:hasPoint simple_dc:ahu-1-return-fan-speed-command ;
+    
+    ## Bug in brick - ratedPowerInput does not actually validate its numbers so easy to make mistakes here.
+    brick:ratedPowerInput [
+        brick:value "1.5"^^xsd:decimal ;
+        brick:hasUnit unit:KiloW
+    ] ;
+
+    dcpm_brick:ratedAirFlowCapacity [
+        brick:value "10"^^xsd:decimal ;
+        brick:hasUnit unit:KiloGM-PER-SEC
+    ] ;
+
+    dcpm_brick:minimumFlowFraction "0.1"^^xsd:decimal .
+
+# telemetry stream so no values
+simple_dc:ahu-1-return-fan-power-sensor a brick:Power_Sensor ;
+    rdfs:label "ahu-1-return-fan-power-sensor" ;
+    brick:hasUnit unit:KiloW .
+
+simple_dc:ahu-1-return-fan-speed-command a brick:Fan_Speed_Command ;
+    rdfs:label "ahu-1-return-fan-speed-command" .
+
+## AHU Fan to supply cold air to the cold aisle
+simple_dc:ahu-1-supply-fan a brick:Fan ;
+    rdfs:label "ahu-1-supply-fan" ;
+    brick:hasPoint simple_dc:ahu-1-supply-fan-power-sensor ;
+    brick:hasPoint simple_dc:ahu-1-supply-fan-speed-command ;
+
+    ## Bug in brick - ratedPowerInput does not actually validate its numbers so easy to make mistakes here.
+    brick:ratedPowerInput [
+        brick:value "1.5"^^xsd:decimal ;
+        brick:hasUnit unit:KiloW
+    ] ;
+
+    dcpm_brick:ratedAirFlowCapacity [
+        brick:value "10"^^xsd:decimal ;
+        brick:hasUnit unit:KiloGM-PER-SEC
+    ] ;
+
+    dcpm_brick:minimumFlowFraction "0.1"^^xsd:decimal .
+
+# telemetry stream so no values
+simple_dc:ahu-1-supply-fan-power-sensor a brick:Power_Sensor ;
+    rdfs:label "ahu-1-supply-fan-power-sensor" ;
+    brick:hasUnit unit:KiloW .
+
+simple_dc:ahu-1-supply-fan-speed-command a brick:Fan_Speed_Command ;
+    rdfs:label "ahu-1-supply-fan-speed-command" .
+
+## AHU Outside Damper
+simple_dc:ahu-1-outside-damper a brick:Outside_Damper ;
+    rdfs:label "ahu-1-outside-damper" ;
+    brick:hasPoint simple_dc:ahu-1-oa-damper-position-command .
+
+simple_dc:ahu-1-oa-damper-position-command a brick:Damper_Position_Command ;
+    rdfs:label "ahu-1-oa-damper-position-command" ;
+    # has two params, a brick:Min_Position_Setpoint_Limit and a brick:Max_Position_Setpoint_Limit, which we'll set to static values for now but could be telemetry in the future
+    dcpm_brick:hasParameter simple_dc:ahu-1-oa-damper-min-limit,
+                           simple_dc:ahu-1-oa-damper-max-limit ;
+    brick:hasUnit unit:PERCENT .
+
+simple_dc:ahu-1-oa-damper-min-limit a brick:Min_Position_Setpoint_Limit ;
+    brick:value "0.15"^^xsd:decimal ;
+    brick:hasUnit unit:PERCENT .
+
+simple_dc:ahu-1-oa-damper-max-limit a brick:Max_Position_Setpoint_Limit ;
+    brick:value "100"^^xsd:decimal ;
+    brick:hasUnit unit:PERCENT .
+
+## AHU Economizer. This is a very basic model just to hold the 'enable' command.
+simple_dc:ahu-1-economizer a brick:Economizer ;
+    rdfs:label "ahu-1-economizer" ;
+    brick:hasPoint simple_dc:ahu-1-economizer-enable-command .
+
+## This is a telemetry point
+simple_dc:ahu-1-economizer-enable-command a brick:Enable_Command .
+
+####
+### 4.0 HVAC Zone and IT Rack
+####
+
+simple_dc:hvac-zone-1 a rec:HVACZone ;
+    rdfs:label "HVAC-Zone-1" ;
+    brick:hasPoint simple_dc:hvac-zone-1-zone-air-temp-sensor ;
+    rec:isLocationOf simple_dc:it-rack-1 .
+
+simple_dc:hot-aisle-1 a dcpm_brick:Hot_Aisle ;
+    rdfs:label "Hot-Aisle-1" ;
+    rec:isPartOf simple_dc:hvac-zone-1 ;
+    brick:hasPoint simple_dc:hot-aisle-1-temp-sensor .
+
+simple_dc:hot-aisle-1-temp-sensor a brick:Zone_Air_Temperature_Sensor ;
+    rdfs:label "hot-aisle-1-temp-sensor" ;
+    # This is kinda weird and isn't a common brick pattern since this a sensor and can't really have parameters
+    # but we're using this for operational limits and not setpoint controls so sticking them on the sensor
+    # seems OK enough, but maybe they'd be better on the hot aisle zone itself? Open to feedback on this
+    dcpm_brick:hasParameter simple_dc:hot-aisle-1-temp-min-limit,
+                           simple_dc:hot-aisle-1-temp-max-limit ;
+    brick:hasUnit unit:DEG_C .
+
+# TODO - Brick doesn't have generic "operational limits" and it's not really clear what a temperature_paramter is supposed to be
+# so these classes might cause us some trouble in the future when brick 2.0 rolls around
+simple_dc:hot-aisle-1-temp-min-limit a dcpm_brick:Min_Temperature_Operational_Limit ;
+    brick:value "20"^^xsd:decimal ;
+    brick:hasUnit unit:DEG_C .
+
+simple_dc:hot-aisle-1-temp-max-limit a dcpm_brick:Max_Temperature_Operational_Limit ;
+    brick:value "35"^^xsd:decimal ;
+    brick:hasUnit unit:DEG_C .
+
+simple_dc:cold-aisle-1 a dcpm_brick:Cold_Aisle ;
+    rdfs:label "Cold-Aisle-1" ;
+    rec:isPartOf simple_dc:hvac-zone-1 ;
+    brick:hasPoint simple_dc:cold-aisle-1-temp-sensor .
+
+simple_dc:cold-aisle-1-temp-sensor a brick:Zone_Air_Temperature_Sensor ;
+    rdfs:label "cold-aisle-1-temp-sensor" ;
+    dcpm_brick:hasParameter simple_dc:cold-aisle-1-temp-min-limit,
+                           simple_dc:cold-aisle-1-temp-max-limit ;
+    brick:hasUnit unit:DEG_C .
+
+simple_dc:cold-aisle-1-temp-min-limit a dcpm_brick:Min_Temperature_Operational_Limit ;
+    brick:value "10"^^xsd:decimal ;
+    brick:hasUnit unit:DEG_C .
+
+simple_dc:cold-aisle-1-temp-max-limit a dcpm_brick:Max_Temperature_Operational_Limit ;
+    brick:value "25"^^xsd:decimal ;
+    brick:hasUnit unit:DEG_C .
+
+simple_dc:hvac-zone-1-zone-air-temp-sensor a brick:Zone_Air_Temperature_Sensor ;
+    rdfs:label "hvac-zone-1-zone-air-temp-sensor" ;
+    brick:hasUnit unit:DEG_C .
+
+
+####
+### 5.0 Battery Energy Storage System (BESS)
+####
+simple_dc:bess-1 a dcpm:BESSType ;
+    rdfs:label "BESS-1" ;
+    dcpm:manufacturer "Sungrow" ;
+    dcpm:model "Power Titan" ;
+    dcpm:assetId "DC-BESS-001" ;
+    # We need to figure out how to model the fact that the BESS can both `suppliesPowerTo` and `suppliedBy` power. 
+    # For now we're modeling it as supplying power to and being supplied by the switchgear, which isn't perfect but gets the point across for now. 
+    # Open to suggestions on better ways to model this.
+    dcpm:suppliesPowerTo simple_dc:switchgear-1 ;
+    dcpm:suppliedBy simple_dc:switchgear-1 ;
+    # BESS is simply modeled for 5MW/10MWh system, ratedPower can be applicable for both charge and discharge power.
+    dcpm:ratedStorageCapacity [
+        brick:value "10000"^^xsd:decimal ;
+        brick:hasUnit unit:KiloW-HR 
+    ] ;
+    dcpm:ratedPower [
+        brick:value "5000"^^xsd:decimal ;
+        brick:hasUnit unit:KiloW 
+    ] ;
+    dcpm:hasTelemetryPoint simple_dc:bess-1-soc,
+                           simple_dc:bess-1-min-soc,
+                           simple_dc:bess-1-max-soc,
+                           simple_dc:bess-1-active-power,
+                           simple_dc:bess-1-voltage,
+                           simple_dc:bess-1-current,
+                           simple_dc:bess-1-charge-power-setpoint,
+                           simple_dc:bess-1-discharge-power-setpoint,
+                           simple_dc:bess-1-charge-efficiency,
+                           simple_dc:bess-1-discharge-efficiency .
+
+simple_dc:bess-1-soc a dcpm:SoC ;
+    rdfs:label "bess-1-soc" ;
+    brick:hasUnit unit:PERCENT .
+
+simple_dc:bess-1-min-soc a dcpm:MinSOC ;
+    rdfs:label "bess-1-min-soc" ;
+    brick:hasUnit unit:PERCENT .
+
+simple_dc:bess-1-max-soc a dcpm:MaxSOC ;
+    rdfs:label "bess-1-max-soc" ;
+    brick:hasUnit unit:PERCENT .
+
+simple_dc:bess-1-active-power a dcpm:ActivePower ;
+    rdfs:label "bess-1-active-power" ;
+    brick:hasUnit unit:KiloW .
+
+simple_dc:bess-1-voltage a dcpm:Voltage ;
+    rdfs:label "bess-1-voltage" ;
+    brick:hasUnit unit:KiloV .
+
+simple_dc:bess-1-charge-power-setpoint a dcpm:ChargePowerSetpoint ;
+    rdfs:label "bess-1-charge-power-setpoint" ;
+    brick:hasUnit unit:KiloW .
+
+simple_dc:bess-1-discharge-power-setpoint a dcpm:DischargePowerSetpoint ;
+    rdfs:label "bess-1-discharge-power-setpoint" ;
+    brick:hasUnit unit:KiloW .
+
+simple_dc:bess-1-charge-efficiency a dcpm:ChargeEfficiency ;
+    rdfs:label "bess-1-charge-efficiency" ;
+    brick:hasUnit unit:UNITLESS .
+
+simple_dc:bess-1-discharge-efficiency a dcpm:DischargeEfficiency ;
+    rdfs:label "bess-1-discharge-efficiency" ;
+    brick:hasUnit unit:UNITLESS .
+
+
+####
+### 6.0 Uninterruptible Power Supply (UPS)
+####
+simple_dc:ups-1 a dcpm:UPSType ;
+    rdfs:label "UPS-1" ;
+    dcpm:manufacturer "Eaton" ;
+    dcpm:model "PDI PowerHub 2" ;
+    dcpm:assetId "DC-UPS-001" ;
+    dcpm:suppliesPowerTo simple_dc:pdu-1 ;
+    dcpm:ratedPower [
+        brick:value "200"^^xsd:decimal ;
+        brick:hasUnit unit:KiloW
+    ] ;
+    dcpm:hasTelemetryPoint simple_dc:ups-1-input-active-power,
+                            simple_dc:ups-1-output-active-power,
+                            simple_dc:ups-1-battery-soc .
+
+simple_dc:ups-1-input-active-power a dcpm:ImportActivePower ;
+    rdfs:label "ups-1-input-active-power" ;
+    brick:hasUnit unit:KiloW .
+simple_dc:ups-1-output-active-power a dcpm:ExportActivePower ;
+    rdfs:label "ups-1-output-active-power" ;
+    brick:hasUnit unit:KiloW .
+simple_dc:ups-1-battery-soc a dcpm:SoC ;
+    rdfs:label "ups-1-battery-soc" ;
+    brick:hasUnit unit:PERCENT .
+
+####
+### 7.0 Power Distribution Unit (PDU)
+####
+simple_dc:pdu-1 a dcpm:PDUType ;
+    rdfs:label "PDU-1" ;
+    dcpm:manufacturer "Eaton" ;
+    dcpm:model "Power Xpert PDU" ;
+    dcpm:assetId "DC-PDU-001" ;
+    dcpm:suppliesPowerTo simple_dc:rack-pdu-1 ;
+    dcpm:hasTelemetryPoint simple_dc:pdu-1-input-active-power,
+                           simple_dc:pdu-1-input-voltage-ll,
+                           simple_dc:pdu-1-input-current .
+
+simple_dc:pdu-1-input-active-power a dcpm:ImportActivePower ;
+    rdfs:label "pdu-1-input-active-power" ;
+    brick:hasUnit unit:KiloW .
+simple_dc:pdu-1-input-voltage a dcpm:InputVoltageLL ;
+    rdfs:label "pdu-1-input-voltage-ll" ;
+    brick:hasUnit unit:V .
+simple_dc:pdu-1-input-current a dcpm:Current ;
+    rdfs:label "pdu-1-input-current" ;
+    brick:hasUnit unit:A .
+
+####
+### 7.1 Rack Power Distribution Unit (Rack-PDU)
+####
+simple_dc:rack-pdu-1 a dcpm:RackPDUType ;
+    rdfs:label "Rack-PDU-1" ;
+    dcpm:manufacturer "Vertiv" ;
+    dcpm:model "Geist UPDU" ;
+    dcpm:assetId "DC-RPDU-001" ;
+    dcpm:suppliesPowerTo simple_dc:it-rack-1 ;
+    dcpm:hasTelemetryPoint simple_dc:rack-pdu-1-input-voltage-ln,
+                           simple_dc:rack-pdu-1-output-power.
+
+simple_dc:rack-pdu-1-input-voltage-ln a dcpm:InputVoltageLN ;
+    rdfs:label "rack-pdu-1-input-voltage-ln" ;
+    brick:hasUnit unit:V .
+simple_dc:rack-pdu-1-output-power a dcpm:ExportActivePower ;
+    rdfs:label "rack-pdu-1-output-power" ;
+    brick:hasUnit unit:KiloW .
+
+####
+### 8.0 IT Rack
+####
+simple_dc:it-rack-1 a dcpm:ITRackType ;
+    rdfs:label "IT-Rack-1" ;
+    dcpm:manufacturer "Vertiv" ;
+    dcpm:model "VR3307" ;
+    dcpm:assetId "DC-RACK-001" ;
+    brick:hasPoint simple_dc:it-rack-1-power-sensor .
+
+simple_dc:it-rack-1-power-sensor a dcpm:ActivePower ;
+    rdfs:label "it-rack-1-power-sensor" ;
+    brick:hasUnit unit:KiloW .

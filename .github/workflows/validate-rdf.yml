@@ -1,0 +1,49 @@
+name: Validate RDF Files
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**/*.ttl'
+      - '**/*.rdf'
+      - '**/*.owl'
+      - 'scripts/validate_rdf.py'
+      - 'scripts/validators/**'
+      - 'scripts/ci_validate.sh'
+      - 'requirements.txt'
+      - '.github/workflows/validate-rdf.yml'
+  pull_request:
+    paths:
+      - '**/*.ttl'
+      - '**/*.rdf'
+      - '**/*.owl'
+      - 'scripts/validate_rdf.py'
+      - 'scripts/validators/**'
+      - 'scripts/ci_validate.sh'
+      - 'requirements.txt'
+      - '.github/workflows/validate-rdf.yml'
+
+jobs:
+  validate-rdf:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      
+      - name: Run RDF validation
+        run: ./scripts/ci_validate.sh
+      
+      - name: Validation passed
+        if: success()
+        run: echo "✓ All RDF files validated successfully"

@@ -1,0 +1,50 @@
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pyre/
+.hypothesis/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+
+# Python packaging and build artifacts
+build/
+dist/
+site/
+.eggs/
+*.egg
+*.egg-info/
+pip-wheel-metadata/
+
+# Python virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Python environment files
+.python-version
+.ipynb_checkpoints/
+
+# Hugo generated files
+website/public/
+website/resources/_gen/
+website/.hugo_build.lock
+
+# Local theme/vendor artifacts
+website/themes/*/resources/_gen/
+
+# Logs
+*.log

@@ -1,0 +1,2213 @@
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix dcpm: <https://qcells.com/schema/dcpm/#> .
+@prefix brick: <https://brickschema.org/schema/Brick#> .
+@prefix s223: <http://data.ashrae.org/standard223#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix qudt: <http://qudt.org/schema/qudt/> .
+@prefix rec:  <https://w3id.org/rec#> .
+
+
+# ========================================
+# Site Shape
+# ========================================
+
+dcpm:SiteShape a sh:NodeShape ;
+    sh:targetClass dcpm:SiteType ;
+    sh:name "Site Shape for DCPM Power System" ;
+    sh:description "SHACL shape requiring each site to have proper power system components" ;
+
+    sh:property [
+        sh:path dcpm:latitude ;
+        sh:datatype xsd:float ;
+        sh:minCount 1 ;
+        sh:name "Site Latitude" ;
+        sh:description "Site must include latitude in decimal degrees"
+    ] ;
+    sh:property [
+        sh:path dcpm:longitude ;
+        sh:datatype xsd:float ;
+        sh:minCount 1 ;
+        sh:name "Site Longitude" ;
+        sh:description "Site must include longitude in decimal degrees"
+    ] ;
+    sh:property [
+        sh:path dcpm:siteId ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+        sh:name "Site Identifier" ;
+        sh:description "Site must have a unique identifier"
+    ] ;
+    sh:property [
+        sh:path dcpm:hasPointOfInterconnection ;
+        sh:class dcpm:PointOfInterconnection ;
+        sh:name "Point of Interconnection" ;
+        sh:description "Site's grid connection point(s)."
+    ] ;
+    sh:property [
+        sh:path dcpm:hasValueStream ;
+        sh:class dcpm:ValueStream ;
+        sh:name "Value Stream" ;
+        sh:description "Revenue or cost optimization pathway associated with the site."
+    ] ;
+    sh:property [
+        sh:path dcpm:containsEquipment ;
+        sh:class dcpm:PowerDeviceType ;
+        sh:name "Contains Equipment" ;
+        sh:description "Power devices physically contained within the site."
+    ] ;
+    sh:property [
+        sh:path dcpm:isLocationOf ;
+        sh:class dcpm:PowerDeviceType ;
+        sh:name "Is Location Of" ;
+        sh:description "Power devices located at this site."
+    ] ;
+    sh:property [
+        sh:path rec:ownedBy ;
+        sh:class rec:Organization ;
+        sh:maxCount 1 ;
+        sh:minCount 1 ;
+        sh:name "Owned By" ;
+        sh:description "Site must be owned by exactly one Organization"
+    ] .
+
+
+# ========================================
+# Point of Interconnection Shape
+# ========================================
+
+dcpm:POIShape a sh:NodeShape ;
+    sh:targetClass dcpm:PointOfInterconnection ;
+    sh:name "Point of Interconnection Shape for DCPM Power System" ;
+    sh:description "SHACL shape for grid interconnection points" ;
+
+    sh:property [
+        sh:path dcpm:feeds ;
+        sh:class dcpm:UtilityMeterType ;
+        sh:name "feeds target" ;
+        sh:description "POI feeds utility meter."
+    ] ;
+    sh:property [
+        sh:path dcpm:suppliesPowerTo ;
+        sh:class dcpm:UtilityMeterType ;
+        sh:name "suppliesPowerTo target" ;
+        sh:description "POI supplies power to utility meter."
+    ] ;
+    sh:property [
+        sh:path dcpm:hasValueStream ;
+        sh:class dcpm:ValueStream ;
+        sh:name "Value Stream" ;
+        sh:description "Value stream program associated with this POI."
+    ] .
+
+
+# ========================================
+# Utility Meter Shape
+# ========================================
+
+dcpm:UtilityMeterShape a sh:NodeShape ;
+    sh:targetClass dcpm:UtilityMeterType ;
+    sh:name "Utility Meter Shape for DCPM Power System" ;
+    sh:description "SHACL shape defining required telemetry points and relationships for utility meters" ;
+
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:or (
+                [ sh:class dcpm:ImportActivePower ]
+                [ sh:class dcpm:ActivePower ]
+            ) ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:KiloW ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "Import Active Power Point" ;
+        sh:description "Utility meter must track imported active power (kW)"
+    ] ;
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:or (
+                [ sh:class dcpm:ImportActiveEnergy ]
+                [ sh:class dcpm:ActiveEnergy ]
+            ) ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:KiloW-HR ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "Import Active Energy Point" ;
+        sh:description "Utility meter must track imported active energy (kWh)"
+    ] ;
+
+    # --- Relationships ---
+    sh:property [
+        sh:path dcpm:feeds ;
+        sh:or (
+            [ sh:class dcpm:TransformerType ]
+            [ sh:class dcpm:SwitchgearType ]
+            [ sh:class dcpm:BuswayType ]
+            [ sh:class dcpm:ATSType ]
+        ) ;
+        sh:name "feeds target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:suppliesPowerTo ;
+        sh:or (
+            [ sh:class dcpm:TransformerType ]
+            [ sh:class dcpm:SwitchgearType ]
+            [ sh:class dcpm:BuswayType ]
+            [ sh:class dcpm:ATSType ]
+        ) ;
+        sh:name "suppliesPowerTo target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:protectedBy ;
+        sh:or (
+            [ sh:class dcpm:SPDType ]
+            [ sh:class dcpm:SwitchgearType ]
+        ) ;
+        sh:name "protectedBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:connectedTo ;
+        sh:or (
+            [ sh:class dcpm:PQMeterType ]
+            [ sh:class dcpm:GatewayType ]
+            [ sh:class dcpm:ControllerType ]
+        ) ;
+        sh:name "connectedTo target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:controlledBy ;
+        sh:class dcpm:ControllerType ;
+        sh:name "controlledBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasLocation ;
+        sh:or (
+            [ sh:class dcpm:ElectricalRoom ]
+            [ sh:class dcpm:SiteType ]
+        ) ;
+        sh:name "hasLocation target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasDocument ;
+        sh:class dcpm:Document ;
+        sh:name "hasDocument target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasSOP ;
+        sh:class dcpm:SOP ;
+        sh:name "hasSOP target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasValueStream ;
+        sh:class dcpm:ValueStream ;
+        sh:name "hasValueStream target" ;
+    ] .
+
+
+# ========================================
+# Transformer Shape
+# ========================================
+
+dcpm:TransformerShape a sh:NodeShape ;
+    sh:targetClass dcpm:TransformerType ;
+    sh:name "Transformer Shape for DCPM Power System" ;
+    sh:description "SHACL shape requiring transformer to have monitoring, connectivity, and relationships" ;
+
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:class dcpm:PrimaryKV ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:KiloV ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "Primary Side Voltage Point" ;
+        sh:description "Transformer must monitor primary side voltage (kV)"
+    ] ;
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:class dcpm:SecondaryKV ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:KiloV ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "Secondary Side Voltage Point" ;
+        sh:description "Transformer must monitor secondary side voltage (kV)"
+    ] ;
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:class dcpm:ActivePower ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:KiloW ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "Active Power Point" ;
+        sh:description "Transformer must monitor active power throughput (kW)"
+    ] ;
+
+    # --- Relationships ---
+    sh:property [
+        sh:path dcpm:feeds ;
+        sh:or (
+            [ sh:class dcpm:ATSType ]
+            [ sh:class dcpm:SwitchgearType ]
+            [ sh:class dcpm:UPSType ]
+        ) ;
+        sh:name "feeds target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:fedBy ;
+        sh:or (
+            [ sh:class dcpm:UtilityMeterType ]
+            [ sh:class dcpm:GeneratorSetType ]
+            [ sh:class dcpm:SwitchgearType ]
+        ) ;
+        sh:name "fedBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:suppliesPowerTo ;
+        sh:or (
+            [ sh:class dcpm:ATSType ]
+            [ sh:class dcpm:SwitchgearType ]
+            [ sh:class dcpm:UPSType ]
+        ) ;
+        sh:name "suppliesPowerTo target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:suppliedBy ;
+        sh:or (
+            [ sh:class dcpm:UtilityMeterType ]
+            [ sh:class dcpm:GeneratorSetType ]
+            [ sh:class dcpm:SwitchgearType ]
+        ) ;
+        sh:name "suppliedBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:primarySource ;
+        sh:or (
+            [ sh:class dcpm:UtilityMeterType ]
+            [ sh:class dcpm:GeneratorSetType ]
+        ) ;
+        sh:name "primarySource" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:backupSource ;
+        sh:or (
+            [ sh:class dcpm:GeneratorSetType ]
+            [ sh:class dcpm:UtilityMeterType ]
+        ) ;
+        sh:name "backupSource" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:protectedBy ;
+        sh:or (
+            [ sh:class dcpm:SwitchgearType ]
+            [ sh:class dcpm:SPDType ]
+        ) ;
+        sh:name "protectedBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:connectedTo ;
+        sh:or (
+            [ sh:class dcpm:PQMeterType ]
+            [ sh:class dcpm:GatewayType ]
+            [ sh:class dcpm:ControllerType ]
+        ) ;
+        sh:name "connectedTo target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:controlledBy ;
+        sh:class dcpm:ControllerType ;
+        sh:name "controlledBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasLocation ;
+        sh:or (
+            [ sh:class dcpm:ElectricalRoom ]
+            [ sh:class dcpm:SiteType ]
+        ) ;
+        sh:name "hasLocation target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasDocument ;
+        sh:class dcpm:Document ;
+        sh:name "hasDocument target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasSOP ;
+        sh:class dcpm:SOP ;
+        sh:name "hasSOP target" ;
+    ] .
+
+
+# ========================================
+# Switchgear Shape
+# ========================================
+
+dcpm:SwitchgearShape a sh:NodeShape ;
+    sh:targetClass dcpm:SwitchgearType ;
+    sh:name "Switchgear Shape for DCPM Power System" ;
+    sh:description "SHACL shape requiring switchgear to have rated specifications, telemetry, and relationships" ;
+
+    # --- Data Properties ---
+    sh:property [
+        sh:path dcpm:ratedVoltage ;
+        sh:minCount 1 ;
+        sh:name "Rated Voltage" ;
+        sh:description "Switchgear must have a rated voltage specification"
+    ] ;
+    sh:property [
+        sh:path dcpm:busbarRating ;
+        sh:minCount 1 ;
+        sh:datatype xsd:float ;
+        sh:name "Busbar Current Rating" ;
+        sh:description "Switchgear must specify busbar current rating in amperes"
+    ] ;
+    sh:property [
+        sh:path dcpm:breakerCount ;
+        sh:datatype xsd:integer ;
+        sh:name "Breaker Count" ;
+        sh:description "Number of circuit breakers installed in switchgear"
+    ] ;
+
+    # --- Telemetry [S] : simple_dc:switchgear-1 ---
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:class dcpm:ActivePower ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:KiloW ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "Bus Active Power Point" ;
+        sh:description "Switchgear must monitor bus active power (kW)"
+    ] ;
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:class dcpm:Voltage ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:V ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "Bus Voltage Point" ;
+        sh:description "Switchgear must monitor bus voltage (V)"
+    ] ;
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:class dcpm:ApparentPower ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:KiloVA ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "Bus Apparent Power Point" ;
+        sh:description "Switchgear must monitor bus apparent power (kVA)"
+    ] ;
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:class dcpm:Frequency ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:HZ ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "Bus Frequency Point" ;
+        sh:description "Switchgear must monitor bus frequency (Hz)"
+    ] ;
+
+    # --- Relationships ---
+    sh:property [
+        sh:path dcpm:feeds ;
+        sh:minCount 1 ;
+        sh:or (
+            [ sh:class dcpm:UPSType ]
+            [ sh:class dcpm:BESSType ]
+            [ sh:class dcpm:PDUType ]
+            [ sh:class dcpm:TransformerType ]
+            [ sh:class dcpm:BuswayType ]
+            [ sh:class dcpm:MCCType ]
+        ) ;
+        sh:name "feeds target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:fedBy ;
+        sh:or (
+            [ sh:class dcpm:ATSType ]
+            [ sh:class dcpm:TransformerType ]
+            [ sh:class dcpm:UtilityMeterType ]
+            [ sh:class dcpm:BESSType ]
+        ) ;
+        sh:name "fedBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:suppliesPowerTo ;
+        sh:or (
+            [ sh:class dcpm:UPSType ]
+            [ sh:class dcpm:BESSType ]
+            [ sh:class dcpm:PDUType ]
+            [ sh:class dcpm:TransformerType ]
+            [ sh:class dcpm:BuswayType ]
+            [ sh:class dcpm:MCCType ]
+        ) ;
+        sh:name "suppliesPowerTo target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:suppliedBy ;
+        sh:or (
+            [ sh:class dcpm:ATSType ]
+            [ sh:class dcpm:TransformerType ]
+            [ sh:class dcpm:UtilityMeterType ]
+            [ sh:class dcpm:BESSType ]
+        ) ;
+        sh:name "suppliedBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:primarySource ;
+        sh:or (
+            [ sh:class dcpm:ATSType ]
+            [ sh:class dcpm:TransformerType ]
+            [ sh:class dcpm:UtilityMeterType ]
+        ) ;
+        sh:name "primarySource" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:backupSource ;
+        sh:or (
+            [ sh:class dcpm:GeneratorSetType ]
+            [ sh:class dcpm:BESSType ]
+            [ sh:class dcpm:ATSType ]
+        ) ;
+        sh:name "backupSource" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:protects ;
+        sh:or (
+            [ sh:class dcpm:UPSType ]
+            [ sh:class dcpm:TransformerType ]
+            [ sh:class dcpm:PDUType ]
+            [ sh:class dcpm:BESSType ]
+            [ sh:class dcpm:FeederType ]
+        ) ;
+        sh:name "protects target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:protectedBy ;
+        sh:or (
+            [ sh:class dcpm:SPDType ]
+            [ sh:class dcpm:SwitchgearType ]
+        ) ;
+        sh:name "protectedBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:connectedTo ;
+        sh:or (
+            [ sh:class dcpm:PQMeterType ]
+            [ sh:class dcpm:GatewayType ]
+            [ sh:class dcpm:ControllerType ]
+        ) ;
+        sh:name "connectedTo target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:controlledBy ;
+        sh:class dcpm:ControllerType ;
+        sh:name "controlledBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasLocation ;
+        sh:class dcpm:ElectricalRoom ;
+        sh:name "hasLocation target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasDocument ;
+        sh:class dcpm:Document ;
+        sh:name "hasDocument target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasSOP ;
+        sh:class dcpm:SOP ;
+        sh:name "hasSOP target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasValueStream ;
+        sh:class dcpm:ValueStream ;
+        sh:name "hasValueStream target" ;
+    ] .
+
+
+# ========================================
+# Generator Shape
+# ========================================
+
+dcpm:GeneratorShape a sh:NodeShape ;
+    sh:targetClass dcpm:GeneratorSetType ;
+    sh:name "Generator Shape for DCPM Power System" ;
+    sh:description "SHACL shape requiring generator to have fuel monitoring, operating status, and relationships" ;
+
+    # --- Data Properties ---
+    sh:property [
+        sh:path dcpm:fuelType ;
+        sh:minCount 1 ;
+        sh:datatype xsd:string ;
+        sh:name "Fuel Type Metadata" ;
+        sh:description "Generator must specify fuel type (Diesel, Natural Gas, Propane, etc.)"
+    ] ;
+    sh:property [
+        sh:path dcpm:ratedPower ;
+        sh:minCount 1 ;
+        sh:property [
+            sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+            sh:hasValue unit:KiloW ;
+            sh:minCount 1 ;
+        ] ;
+        sh:name "Rated Power" ;
+        sh:description "Generator must have rated power"
+    ] ;
+
+    # --- Telemetry  ---
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:class dcpm:FuelLevel ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:PERCENT ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "Fuel Level Point" ;
+        sh:description "Generator must monitor fuel level (%)"
+    ] ;
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:class dcpm:ExportActivePower ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:KiloW ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "Output Active Power Point" ;
+        sh:description "Generator must monitor output active power (kW)"
+    ] ;
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:class dcpm:OutputVoltageLL ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:KiloV ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "Output Voltage Line-to-Line Point" ;
+        sh:description "Generator must monitor output voltage line-to-line (kV)"
+    ] ;
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:class dcpm:Frequency ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:HZ ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "Frequency Point" ;
+        sh:description "Generator must monitor output frequency (Hz)"
+    ] ;
+
+    # --- Relationships ---
+    sh:property [
+        sh:path dcpm:feeds ;
+        sh:or (
+            [ sh:class dcpm:ATSType ]
+            [ sh:class dcpm:SwitchgearType ]
+            [ sh:class dcpm:TransformerType ]
+        ) ;
+        sh:name "feeds target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:suppliesPowerTo ;
+        sh:or (
+            [ sh:class dcpm:ATSType ]
+            [ sh:class dcpm:SwitchgearType ]
+            [ sh:class dcpm:TransformerType ]
+        ) ;
+        sh:name "suppliesPowerTo target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:protectedBy ;
+        sh:or (
+            [ sh:class dcpm:SwitchgearType ]
+            [ sh:class dcpm:SPDType ]
+        ) ;
+        sh:name "protectedBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:connectedTo ;
+        sh:or (
+            [ sh:class dcpm:GatewayType ]
+            [ sh:class dcpm:ControllerType ]
+            [ sh:class dcpm:PQMeterType ]
+        ) ;
+        sh:name "connectedTo target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:controlledBy ;
+        sh:class dcpm:ControllerType ;
+        sh:name "controlledBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasLocation ;
+        sh:or (
+            [ sh:class dcpm:GeneratorYard ]
+            [ sh:class dcpm:GeneratorRoom ]
+        ) ;
+        sh:name "hasLocation target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasDocument ;
+        sh:class dcpm:Document ;
+        sh:name "hasDocument target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasSOP ;
+        sh:class dcpm:SOP ;
+        sh:name "hasSOP target" ;
+    ] .
+
+
+# ========================================
+# ATS/STS Shapes
+# ========================================
+
+dcpm:ATSShape a sh:NodeShape ;
+    sh:targetClass dcpm:ATSType ;
+    sh:name "Automatic Transfer Switch Shape for DCPM Power System" ;
+    sh:description "SHACL shape requiring ATS to have source selection, monitoring, and relationships" ;
+
+    # --- Data Properties ---
+    sh:property [
+        sh:path dcpm:transferTimeMS ;
+        sh:datatype xsd:float ;
+        sh:name "Transfer Time (ms)" ;
+        sh:description "ATS transfer time during source changeover in milliseconds"
+    ] ;
+    sh:property [
+        sh:path dcpm:numberOfPoles ;
+        sh:minCount 1 ;
+        sh:datatype xsd:integer ;
+        sh:name "Number of Poles" ;
+        sh:description "ATS must specify number of poles (1P, 2P, 3P, 4P)"
+    ] ;
+
+    # --- Relationships ---
+    sh:property [
+        sh:path dcpm:feeds ;
+        sh:minCount 1 ;
+        sh:or (
+            [ sh:class dcpm:SwitchgearType ]
+            [ sh:class dcpm:UPSType ]
+            [ sh:class dcpm:TransformerType ]
+        ) ;
+        sh:name "feeds target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:fedBy ;
+        sh:or (
+            [ sh:class dcpm:TransformerType ]
+            [ sh:class dcpm:UtilityMeterType ]
+            [ sh:class dcpm:GeneratorSetType ]
+        ) ;
+        sh:name "fedBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:suppliesPowerTo ;
+        sh:or (
+            [ sh:class dcpm:SwitchgearType ]
+            [ sh:class dcpm:UPSType ]
+            [ sh:class dcpm:TransformerType ]
+        ) ;
+        sh:name "suppliesPowerTo target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:suppliedBy ;
+        sh:or (
+            [ sh:class dcpm:TransformerType ]
+            [ sh:class dcpm:UtilityMeterType ]
+            [ sh:class dcpm:GeneratorSetType ]
+        ) ;
+        sh:name "suppliedBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:primarySource ;
+        sh:or (
+            [ sh:class dcpm:TransformerType ]
+            [ sh:class dcpm:UtilityMeterType ]
+        ) ;
+        sh:name "primarySource" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:backupSource ;
+        sh:or (
+            [ sh:class dcpm:GeneratorSetType ]
+            [ sh:class dcpm:TransformerType ]
+        ) ;
+        sh:name "backupSource" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:protectedBy ;
+        sh:or (
+            [ sh:class dcpm:SwitchgearType ]
+            [ sh:class dcpm:SPDType ]
+        ) ;
+        sh:name "protectedBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:connectedTo ;
+        sh:or (
+            [ sh:class dcpm:GatewayType ]
+            [ sh:class dcpm:ControllerType ]
+            [ sh:class dcpm:PQMeterType ]
+        ) ;
+        sh:name "connectedTo target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:controlledBy ;
+        sh:class dcpm:ControllerType ;
+        sh:name "controlledBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasLocation ;
+        sh:class dcpm:ElectricalRoom ;
+        sh:name "hasLocation target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasDocument ;
+        sh:class dcpm:Document ;
+        sh:name "hasDocument target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasSOP ;
+        sh:class dcpm:SOP ;
+        sh:name "hasSOP target" ;
+    ] .
+
+dcpm:STSShape a sh:NodeShape ;
+    sh:targetClass dcpm:STSType ;
+    sh:name "Static Transfer Switch Shape for DCPM Power System" ;
+    sh:description "SHACL shape requiring STS to have advanced monitoring and control capabilities" ;
+
+    sh:property [
+        sh:path dcpm:transferTimeMS ;
+        sh:minCount 1 ;
+        sh:datatype xsd:float ;
+        sh:name "Transfer Time (ms)" ;
+        sh:description "STS must specify ultra-fast transfer time in milliseconds"
+    ] ;
+    sh:property [
+        sh:path dcpm:numberOfPoles ;
+        sh:minCount 1 ;
+        sh:datatype xsd:integer ;
+        sh:name "Number of Poles" ;
+        sh:description "STS must specify number of poles"
+    ] .
+
+
+# ========================================
+# UPS Shape
+# ========================================
+
+dcpm:UPSShape a sh:NodeShape ;
+    sh:targetClass dcpm:UPSType ;
+    sh:name "Uninterruptible Power Supply Shape for DCPM Power System" ;
+    sh:description "SHACL shape requiring UPS to have battery health, runtime monitoring, and relationships" ;
+
+    # --- Telemetry  ---
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:class dcpm:SoC ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:PERCENT ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "State of Charge Point" ;
+        sh:description "UPS must monitor battery state of charge (%)"
+    ] ;
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:class dcpm:SoH ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:PERCENT ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "State of Health Point" ;
+        sh:description "UPS must monitor battery state of health (%)"
+    ] ;
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:class dcpm:RemainingTime ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:MIN ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "Remaining Backup Time Point" ;
+        sh:description "UPS must provide remaining runtime estimation (min)"
+    ] ;
+
+    # --- Telemetry [S] : simple_dc:ups-1 ---
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:class dcpm:ImportActivePower ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:KiloW ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "Input Active Power Point" ;
+        sh:description "UPS must monitor input active power (kW)"
+    ] ;
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:class dcpm:ExportActivePower ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:KiloW ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "Output Active Power Point" ;
+        sh:description "UPS must monitor output active power (kW)"
+    ] ;
+
+    # --- Relationships ---
+    sh:property [
+        sh:path dcpm:feeds ;
+        sh:minCount 1 ;
+        sh:or (
+            [ sh:class dcpm:PDUType ]
+            [ sh:class dcpm:BuswayType ]
+            [ sh:class dcpm:STSType ]
+        ) ;
+        sh:name "feeds target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:fedBy ;
+        sh:or (
+            [ sh:class dcpm:SwitchgearType ]
+            [ sh:class dcpm:ATSType ]
+            [ sh:class dcpm:TransformerType ]
+        ) ;
+        sh:name "fedBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:suppliesPowerTo ;
+        sh:or (
+            [ sh:class dcpm:PDUType ]
+            [ sh:class dcpm:BuswayType ]
+            [ sh:class dcpm:STSType ]
+        ) ;
+        sh:name "suppliesPowerTo target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:suppliedBy ;
+        sh:or (
+            [ sh:class dcpm:SwitchgearType ]
+            [ sh:class dcpm:ATSType ]
+            [ sh:class dcpm:TransformerType ]
+        ) ;
+        sh:name "suppliedBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:primarySource ;
+        sh:or (
+            [ sh:class dcpm:SwitchgearType ]
+            [ sh:class dcpm:ATSType ]
+        ) ;
+        sh:name "primarySource" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:backupSource ;
+        sh:or (
+            [ sh:class dcpm:SwitchgearType ]
+            [ sh:class dcpm:ATSType ]
+        ) ;
+        sh:name "backupSource" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:protects ;
+        sh:or (
+            [ sh:class dcpm:PDUType ]
+            [ sh:class dcpm:BuswayType ]
+        ) ;
+        sh:name "protects target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:protectedBy ;
+        sh:or (
+            [ sh:class dcpm:SwitchgearType ]
+            [ sh:class dcpm:SPDType ]
+        ) ;
+        sh:name "protectedBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:connectedTo ;
+        sh:or (
+            [ sh:class dcpm:BMSType ]
+            [ sh:class dcpm:GatewayType ]
+            [ sh:class dcpm:ControllerType ]
+            [ sh:class dcpm:PQMeterType ]
+        ) ;
+        sh:name "connectedTo target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:controlledBy ;
+        sh:class dcpm:ControllerType ;
+        sh:name "controlledBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasLocation ;
+        sh:class dcpm:ElectricalRoom ;
+        sh:name "hasLocation target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasDocument ;
+        sh:class dcpm:Document ;
+        sh:name "hasDocument target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasSOP ;
+        sh:class dcpm:SOP ;
+        sh:name "hasSOP target" ;
+    ] .
+
+
+# ========================================
+# BESS Shape
+# ========================================
+
+dcpm:BESSShape a sh:NodeShape ;
+    sh:targetClass dcpm:BESSType ;
+    sh:name "Battery Energy Storage System Shape for DCPM Power System" ;
+    sh:description "SHACL shape requiring BESS to have monitoring capabilities and relationships" ;
+
+    # --- Data Properties ---
+    sh:property [
+        sh:path dcpm:ratedStorageCapacity ;
+        sh:minCount 1 ;
+        sh:property [
+            sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+            sh:hasValue unit:KiloW-HR ;
+            sh:minCount 1 ;
+        ] ;
+        sh:name "Rated Storage Capacity" ;
+        sh:description "BESS must specify rated energy storage capacity (kWh)"
+    ] ;
+
+    # --- Telemetry  ---
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:class dcpm:SoC ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:PERCENT ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "State of Charge" ;
+        sh:description "BESS must monitor state of charge (%)"
+    ] ;
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:class dcpm:SoH ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:PERCENT ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "State of Health" ;
+        sh:description "BESS must monitor state of health (%)"
+    ] ;
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:class dcpm:MinSOC ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:PERCENT ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "Minimum State of Charge" ;
+        sh:description "BESS minimum SoC limit"
+    ] ;
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:class dcpm:MaxSOC ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:PERCENT ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "Maximum State of Charge" ;
+        sh:description "BESS maximum SoC limit"
+    ] ;
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:class dcpm:ChargePowerSetpoint ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:KiloW ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "Charge Power Setpoint" ;
+        sh:description "BESS charge power setpoint (kW)"
+    ] ;
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:class dcpm:DischargePowerSetpoint ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:KiloW ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "Discharge Power Setpoint" ;
+        sh:description "BESS discharge power setpoint (kW)"
+    ] ;
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:class dcpm:ChargeEfficiency ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:UNITLESS ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "Charge Efficiency" ;
+        sh:description "BESS charge efficiency"
+    ] ;
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:class dcpm:DischargeEfficiency ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:UNITLESS ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "Discharge Efficiency" ;
+        sh:description "BESS discharge efficiency"
+    ] ;
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:class dcpm:ActivePower ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:KiloW ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "Active Power Point" ;
+        sh:description "BESS must monitor active power (kW)"
+    ] ;
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:class dcpm:Voltage ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:KiloV ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "Voltage Point" ;
+        sh:description "BESS must monitor voltage (kV)"
+    ] ;
+
+    # --- Relationships ---
+    sh:property [
+        sh:path dcpm:feeds ;
+        sh:or (
+            [ sh:class dcpm:SwitchgearType ]
+            [ sh:class dcpm:BuswayType ]
+            [ sh:class dcpm:PDUType ]
+        ) ;
+        sh:name "feeds (discharge) target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:fedBy ;
+        sh:or (
+            [ sh:class dcpm:SwitchgearType ]
+            [ sh:class dcpm:BuswayType ]
+        ) ;
+        sh:name "fedBy (charge) source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:suppliesPowerTo ;
+        sh:or (
+            [ sh:class dcpm:SwitchgearType ]
+            [ sh:class dcpm:BuswayType ]
+            [ sh:class dcpm:PDUType ]
+        ) ;
+        sh:name "suppliesPowerTo (discharge) target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:suppliedBy ;
+        sh:or (
+            [ sh:class dcpm:SwitchgearType ]
+            [ sh:class dcpm:BuswayType ]
+        ) ;
+        sh:name "suppliedBy (charge) source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:primarySource ;
+        sh:or (
+            [ sh:class dcpm:SwitchgearType ]
+            [ sh:class dcpm:BuswayType ]
+        ) ;
+        sh:name "primarySource (charging source)" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:protectedBy ;
+        sh:or (
+            [ sh:class dcpm:SwitchgearType ]
+            [ sh:class dcpm:SPDType ]
+        ) ;
+        sh:name "protectedBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:connectedTo ;
+        sh:or (
+            [ sh:class dcpm:BMSType ]
+            [ sh:class dcpm:GatewayType ]
+            [ sh:class dcpm:ControllerType ]
+            [ sh:class dcpm:PQMeterType ]
+        ) ;
+        sh:name "connectedTo target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:controlledBy ;
+        sh:class dcpm:ControllerType ;
+        sh:name "controlledBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasLocation ;
+        sh:or (
+            [ sh:class dcpm:ElectricalRoom ]
+            [ sh:class dcpm:BatteryRoom ]
+        ) ;
+        sh:name "hasLocation target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasDocument ;
+        sh:class dcpm:Document ;
+        sh:name "hasDocument target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasSOP ;
+        sh:class dcpm:SOP ;
+        sh:name "hasSOP target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasValueStream ;
+        sh:class dcpm:ValueStream ;
+        sh:name "hasValueStream target" ;
+    ] .
+
+
+# ========================================
+# BMS Shape
+# ========================================
+
+dcpm:BMSShape a sh:NodeShape ;
+    sh:targetClass dcpm:BMSType ;
+    sh:name "Battery Management System Shape for DCPM Power System" ;
+    sh:description "SHACL shape for BMS monitoring and connection" ;
+
+    sh:property [
+        sh:path dcpm:connectedTo ;
+        sh:or (
+            [ sh:class dcpm:BESSType ]
+            [ sh:class dcpm:UPSType ]
+            [ sh:class dcpm:GatewayType ]
+            [ sh:class dcpm:ControllerType ]
+        ) ;
+        sh:name "connectedTo target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasLocation ;
+        sh:or (
+            [ sh:class dcpm:BatteryRoom ]
+            [ sh:class dcpm:ElectricalRoom ]
+        ) ;
+        sh:name "hasLocation target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasDocument ;
+        sh:class dcpm:Document ;
+        sh:name "hasDocument target" ;
+    ] .
+
+
+# ========================================
+# PDU and Distribution Shapes
+# ========================================
+
+dcpm:PDUShape a sh:NodeShape ;
+    sh:targetClass dcpm:PDUType ;
+    sh:name "Power Distribution Unit Shape for DCPM Power System" ;
+    sh:description "SHACL shape requiring PDU to have power monitoring, distribution, and relationships" ;
+
+    # --- Data Properties ---
+    sh:property [
+        sh:path dcpm:circuitCount ;
+        sh:minCount 1 ;
+        sh:datatype xsd:integer ;
+        sh:name "Circuit Count" ;
+        sh:description "PDU must specify number of electrical circuits"
+    ] ;
+
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:or (
+                [ sh:class dcpm:ImportActivePower ]
+                [ sh:class dcpm:ActivePower ]
+            ) ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:KiloW ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "Input Active Power" ;
+        sh:description "PDU must monitor input active power (kW)"
+    ] ;
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:or (
+                [ sh:class dcpm:Voltage ]
+                [ sh:class dcpm:InputVoltageLN ]
+                [ sh:class dcpm:InputVoltageLL ]
+            ) ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:V ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "Voltage Monitoring" ;
+        sh:description "PDU must monitor input voltage"
+    ] ;
+
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:class dcpm:Current ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:A ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "Input Current Point" ;
+        sh:description "PDU must monitor input current (A)"
+    ] ;
+
+    # --- Relationships ---
+    sh:property [
+        sh:path dcpm:feeds ;
+        sh:or (
+            [ sh:class dcpm:BuswayType ]
+            [ sh:class dcpm:RackPDUType ]
+            [ sh:class dcpm:ITRackType ]
+        ) ;
+        sh:name "feeds target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:fedBy ;
+        sh:or (
+            [ sh:class dcpm:UPSType ]
+            [ sh:class dcpm:SwitchgearType ]
+            [ sh:class dcpm:BuswayType ]
+            [ sh:class dcpm:STSType ]
+        ) ;
+        sh:name "fedBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:suppliesPowerTo ;
+        sh:or (
+            [ sh:class dcpm:BuswayType ]
+            [ sh:class dcpm:RackPDUType ]
+            [ sh:class dcpm:ITRackType ]
+        ) ;
+        sh:name "suppliesPowerTo target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:suppliedBy ;
+        sh:or (
+            [ sh:class dcpm:UPSType ]
+            [ sh:class dcpm:SwitchgearType ]
+            [ sh:class dcpm:BuswayType ]
+            [ sh:class dcpm:STSType ]
+        ) ;
+        sh:name "suppliedBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:primarySource ;
+        sh:or (
+            [ sh:class dcpm:UPSType ]
+            [ sh:class dcpm:SwitchgearType ]
+        ) ;
+        sh:name "primarySource" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:backupSource ;
+        sh:or (
+            [ sh:class dcpm:UPSType ]
+            [ sh:class dcpm:SwitchgearType ]
+        ) ;
+        sh:name "backupSource" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:protectedBy ;
+        sh:or (
+            [ sh:class dcpm:UPSType ]
+            [ sh:class dcpm:SwitchgearType ]
+            [ sh:class dcpm:SPDType ]
+        ) ;
+        sh:name "protectedBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:protects ;
+        sh:or (
+            [ sh:class dcpm:RackPDUType ]
+            [ sh:class dcpm:ITRackType ]
+            [ sh:class dcpm:BuswayType ]
+        ) ;
+        sh:name "protects target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:connectedTo ;
+        sh:or (
+            [ sh:class dcpm:GatewayType ]
+            [ sh:class dcpm:ControllerType ]
+            [ sh:class dcpm:PQMeterType ]
+        ) ;
+        sh:name "connectedTo target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:controlledBy ;
+        sh:class dcpm:ControllerType ;
+        sh:name "controlledBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasLocation ;
+        sh:or (
+            [ sh:class dcpm:ElectricalRoom ]
+            [ sh:class dcpm:DataHall ]
+        ) ;
+        sh:name "hasLocation target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasDocument ;
+        sh:class dcpm:Document ;
+        sh:name "hasDocument target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasSOP ;
+        sh:class dcpm:SOP ;
+        sh:name "hasSOP target" ;
+    ] .
+
+dcpm:RackPDUShape a sh:NodeShape ;
+    sh:targetClass dcpm:RackPDUType ;
+    sh:name "Rack PDU Shape for DCPM Power System" ;
+    sh:description "SHACL shape requiring rack PDUs to have outlet-level power monitoring and relationships" ;
+
+    # --- Data Properties ---
+    sh:property [
+        sh:path dcpm:outletCount ;
+        sh:minCount 1 ;
+        sh:datatype xsd:integer ;
+        sh:name "Outlet Count" ;
+        sh:description "Rack PDU must specify number of power outlets"
+    ] ;
+    sh:property [
+        sh:path dcpm:circuitCount ;
+        sh:minCount 1 ;
+        sh:datatype xsd:integer ;
+        sh:name "Circuit Count" ;
+        sh:description "Rack PDU must specify number of circuits"
+    ] ;
+
+    # --- Telemetry ---
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:class dcpm:InputVoltageLN ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:V ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "Input Voltage Point" ;
+        sh:description "Rack PDU must monitor input line-to-neutral voltage (V)"
+    ] ;
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:class dcpm:ExportActivePower ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:KiloW ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "Output Power Point" ;
+        sh:description "Rack PDU must monitor output active power (kW)"
+    ] ;
+
+    # --- Relationships ---
+    sh:property [
+        sh:path dcpm:feeds ;
+        sh:class dcpm:ITRackType ;
+        sh:name "feeds target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:fedBy ;
+        sh:or (
+            [ sh:class dcpm:PDUType ]
+            [ sh:class dcpm:BuswayType ]
+            [ sh:class dcpm:UPSType ]
+        ) ;
+        sh:name "fedBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:suppliesPowerTo ;
+        sh:class dcpm:ITRackType ;
+        sh:name "suppliesPowerTo target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasLocation ;
+        sh:class dcpm:DataHall ;
+        sh:name "hasLocation target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasDocument ;
+        sh:class dcpm:Document ;
+        sh:name "hasDocument target" ;
+    ] .
+
+
+# ========================================
+# Busway Shape
+# ========================================
+
+dcpm:BuswayShape a sh:NodeShape ;
+    sh:targetClass dcpm:BuswayType ;
+    sh:name "Busway Shape for DCPM Power System" ;
+    sh:description "SHACL shape requiring busway to have monitoring, connections, and relationships" ;
+
+    # --- Telemetry ---
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:class dcpm:InputActivePower ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:KiloW ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "Power Monitoring" ;
+        sh:description "Busway must have power monitoring capabilities (kW)"
+    ] ;
+
+    # --- Relationships ---
+    sh:property [
+        sh:path dcpm:feeds ;
+        sh:or (
+            [ sh:class dcpm:PDUType ]
+            [ sh:class dcpm:RackPDUType ]
+            [ sh:class dcpm:RPPType ]
+            [ sh:class dcpm:ITRackType ]
+            [ sh:class dcpm:BESSType ]
+        ) ;
+        sh:name "feeds target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:fedBy ;
+        sh:or (
+            [ sh:class dcpm:UPSType ]
+            [ sh:class dcpm:PDUType ]
+            [ sh:class dcpm:SwitchgearType ]
+            [ sh:class dcpm:BESSType ]
+        ) ;
+        sh:name "fedBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:suppliesPowerTo ;
+        sh:or (
+            [ sh:class dcpm:PDUType ]
+            [ sh:class dcpm:RackPDUType ]
+            [ sh:class dcpm:RPPType ]
+            [ sh:class dcpm:ITRackType ]
+            [ sh:class dcpm:BESSType ]
+        ) ;
+        sh:name "suppliesPowerTo target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:suppliedBy ;
+        sh:or (
+            [ sh:class dcpm:UtilityMeterType ]
+            [ sh:class dcpm:UPSType ]
+            [ sh:class dcpm:SwitchgearType ]
+            [ sh:class dcpm:BESSType ]
+        ) ;
+        sh:name "suppliedBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:protectedBy ;
+        sh:or (
+            [ sh:class dcpm:SwitchgearType ]
+            [ sh:class dcpm:UPSType ]
+            [ sh:class dcpm:SPDType ]
+        ) ;
+        sh:name "protectedBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:connectedTo ;
+        sh:or (
+            [ sh:class dcpm:GatewayType ]
+            [ sh:class dcpm:ControllerType ]
+            [ sh:class dcpm:PQMeterType ]
+        ) ;
+        sh:name "connectedTo target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasLocation ;
+        sh:or (
+            [ sh:class dcpm:DataHall ]
+            [ sh:class dcpm:ElectricalRoom ]
+        ) ;
+        sh:name "hasLocation target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasDocument ;
+        sh:class dcpm:Document ;
+        sh:name "hasDocument target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasSOP ;
+        sh:class dcpm:SOP ;
+        sh:name "hasSOP target" ;
+    ] .
+
+
+# ========================================
+# IT Rack Shape
+# ========================================
+
+dcpm:ITRackShape a sh:NodeShape ;
+    sh:targetClass dcpm:ITRackType ;
+    sh:name "IT Rack Shape for DCPM Power System" ;
+    sh:description "Terminal load — consumes power only" ;
+
+    # --- Telemetry ---
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:class dcpm:ActivePower ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:KiloW ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "Active Power" ;
+        sh:description "IT Rack power consumption (kW)"
+    ] ;
+
+    # --- Relationships ---
+    sh:property [
+        sh:path dcpm:fedBy ;
+        sh:or (
+            [ sh:class dcpm:RackPDUType ]
+            [ sh:class dcpm:BuswayType ]
+            [ sh:class dcpm:PDUType ]
+        ) ;
+        sh:name "fedBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:suppliedBy ;
+        sh:or (
+            [ sh:class dcpm:RackPDUType ]
+            [ sh:class dcpm:BuswayType ]
+            [ sh:class dcpm:PDUType ]
+        ) ;
+        sh:name "suppliedBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:primarySource ;
+        sh:or (
+            [ sh:class dcpm:RackPDUType ]
+            [ sh:class dcpm:BuswayType ]
+            [ sh:class dcpm:PDUType ]
+        ) ;
+        sh:name "primarySource" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:backupSource ;
+        sh:or (
+            [ sh:class dcpm:RackPDUType ]
+            [ sh:class dcpm:BuswayType ]
+            [ sh:class dcpm:PDUType ]
+        ) ;
+        sh:name "backupSource" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:connectedTo ;
+        sh:or (
+            [ sh:class dcpm:GatewayType ]
+            [ sh:class dcpm:ControllerType ]
+        ) ;
+        sh:name "connectedTo target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasLocation ;
+        sh:class dcpm:DataHall ;
+        sh:name "hasLocation target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasDocument ;
+        sh:class dcpm:Document ;
+        sh:name "hasDocument target" ;
+    ] .
+
+
+# ========================================
+# Feeder Shape
+# ========================================
+
+dcpm:FeederShape a sh:NodeShape ;
+    sh:targetClass dcpm:FeederType ;
+    sh:name "Feeder Shape for DCPM Power System" ;
+    sh:description "Individual feeder circuit within a switchgear" ;
+
+    sh:property [
+        sh:path dcpm:fedBy ;
+        sh:class dcpm:SwitchgearType ;
+        sh:name "fedBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:feeds ;
+        sh:or (
+            [ sh:class dcpm:TransformerType ]
+            [ sh:class dcpm:UPSType ]
+            [ sh:class dcpm:PDUType ]
+            [ sh:class dcpm:MCCType ]
+        ) ;
+        sh:name "feeds target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:protectedBy ;
+        sh:class dcpm:SwitchgearType ;
+        sh:name "protectedBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasDocument ;
+        sh:class dcpm:Document ;
+        sh:name "hasDocument target" ;
+    ] .
+
+
+# ========================================
+# MCC Shape
+# ========================================
+
+dcpm:MCCShape a sh:NodeShape ;
+    sh:targetClass dcpm:MCCType ;
+    sh:name "Motor Control Center Shape for DCPM Power System" ;
+    sh:description "SHACL shape for motor control centers" ;
+
+    sh:property [
+        sh:path dcpm:feeds ;
+        sh:class dcpm:MotorFeederType ;
+        sh:name "feeds target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:fedBy ;
+        sh:or (
+            [ sh:class dcpm:SwitchgearType ]
+            [ sh:class dcpm:TransformerType ]
+            [ sh:class dcpm:PDUType ]
+        ) ;
+        sh:name "fedBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:protects ;
+        sh:class dcpm:MotorFeederType ;
+        sh:name "protects target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:controlledBy ;
+        sh:class dcpm:ControllerType ;
+        sh:name "controlledBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasLocation ;
+        sh:class dcpm:ElectricalRoom ;
+        sh:name "hasLocation target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasDocument ;
+        sh:class dcpm:Document ;
+        sh:name "hasDocument target" ;
+    ] .
+
+
+# ========================================
+# Motor Feeder Shape
+# ========================================
+
+dcpm:MotorFeederShape a sh:NodeShape ;
+    sh:targetClass dcpm:MotorFeederType ;
+    sh:name "Motor Feeder Shape for DCPM Power System" ;
+    sh:description "Individual motor starter/feeder within an MCC" ;
+
+    sh:property [
+        sh:path dcpm:fedBy ;
+        sh:class dcpm:MCCType ;
+        sh:name "fedBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:protectedBy ;
+        sh:class dcpm:MCCType ;
+        sh:name "protectedBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:controlledBy ;
+        sh:class dcpm:ControllerType ;
+        sh:name "controlledBy source" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasDocument ;
+        sh:class dcpm:Document ;
+        sh:name "hasDocument target" ;
+    ] .
+
+
+# ========================================
+# SPD Shape
+# ========================================
+
+dcpm:SPDShape a sh:NodeShape ;
+    sh:targetClass dcpm:SPDType ;
+    sh:name "Surge Protective Device Shape for DCPM Power System" ;
+    sh:description "SHACL shape for surge protection devices" ;
+
+    sh:property [
+        sh:path dcpm:protects ;
+        sh:or (
+            [ sh:class dcpm:SwitchgearType ]
+            [ sh:class dcpm:TransformerType ]
+            [ sh:class dcpm:PDUType ]
+            [ sh:class dcpm:UPSType ]
+            [ sh:class dcpm:BuswayType ]
+        ) ;
+        sh:name "protects target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasLocation ;
+        sh:class dcpm:ElectricalRoom ;
+        sh:name "hasLocation target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasDocument ;
+        sh:class dcpm:Document ;
+        sh:name "hasDocument target" ;
+    ] .
+
+
+# ========================================
+# Grounding Network Shape
+# ========================================
+
+dcpm:GroundingNetworkShape a sh:NodeShape ;
+    sh:targetClass dcpm:GroundingNetworkType ;
+    sh:name "Grounding Network Shape for DCPM Power System" ;
+    sh:description "SHACL shape for grounding and bonding network" ;
+
+    sh:property [
+        sh:path dcpm:protects ;
+        sh:class dcpm:PowerDeviceType ;
+        sh:name "protects target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasDocument ;
+        sh:class dcpm:Document ;
+        sh:name "hasDocument target" ;
+    ] .
+
+
+# ========================================
+# Power Quality and Monitoring Shapes
+# ========================================
+
+dcpm:PQMeterShape a sh:NodeShape ;
+    sh:targetClass dcpm:PQMeterType ;
+    sh:name "Power Quality Meter Shape for DCPM Power System" ;
+    sh:description "SHACL shape requiring power quality meters to have comprehensive monitoring" ;
+
+    # --- Telemetry  ---
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:class dcpm:THDV ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:PERCENT ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "Total Harmonic Distortion Voltage" ;
+        sh:description "PQ Meter must measure voltage THD (%)"
+    ] ;
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:qualifiedValueShape [
+            sh:class dcpm:THDI ;
+            sh:property [
+                sh:path [ sh:alternativePath ( brick:hasUnit qudt:hasUnit ) ] ;
+                sh:hasValue unit:PERCENT ;
+                sh:minCount 1 ;
+            ]
+        ] ;
+        sh:qualifiedMinCount 1 ;
+        sh:name "Total Harmonic Distortion Current" ;
+        sh:description "PQ Meter must measure current THD (%)"
+    ] ;
+
+    # --- Relationships ---
+    sh:property [
+        sh:path dcpm:connectedTo ;
+        sh:class dcpm:PowerDeviceType ;
+        sh:name "connectedTo target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasLocation ;
+        sh:class dcpm:ElectricalRoom ;
+        sh:name "hasLocation target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasDocument ;
+        sh:class dcpm:Document ;
+        sh:name "hasDocument target" ;
+    ] .
+
+
+# ========================================
+# Control and Monitoring Infrastructure
+# ========================================
+
+dcpm:ControllerShape a sh:NodeShape ;
+    sh:targetClass dcpm:ControllerType ;
+    sh:name "Power System Controller Shape for DCPM" ;
+    sh:description "SHACL shape requiring controllers to have monitoring, control, and connection capabilities" ;
+
+    sh:property [
+        sh:path dcpm:communicationProtocol ;
+        sh:minCount 1 ;
+        sh:datatype xsd:string ;
+        sh:name "Communication Protocol" ;
+        sh:description "Controller must support a communication protocol (Modbus TCP, BACnet, OPC UA, etc.)"
+    ] ;
+    sh:property [
+        sh:path dcpm:ipAddress ;
+        sh:minCount 1 ;
+        sh:datatype xsd:string ;
+        sh:name "IP Address" ;
+        sh:description "Controller must have a network address"
+    ] ;
+    sh:property [
+        sh:path dcpm:controls ;
+        sh:class dcpm:PowerDeviceType ;
+        sh:name "controls target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:connectedTo ;
+        sh:or (
+            [ sh:class dcpm:GatewayType ]
+            [ sh:class dcpm:PowerDeviceType ]
+        ) ;
+        sh:name "connectedTo target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasLocation ;
+        sh:class dcpm:ElectricalRoom ;
+        sh:name "hasLocation target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasDocument ;
+        sh:class dcpm:Document ;
+        sh:name "hasDocument target" ;
+    ] .
+
+dcpm:GatewayShape a sh:NodeShape ;
+    sh:targetClass dcpm:GatewayType ;
+    sh:name "Gateway/SCADA Shape for DCPM Power System" ;
+    sh:description "SHACL shape requiring gateways to have communication and aggregation capabilities" ;
+
+    sh:property [
+        sh:path dcpm:communicationProtocol ;
+        sh:minCount 1 ;
+        sh:datatype xsd:string ;
+        sh:name "Communication Protocol" ;
+        sh:description "Gateway must support communication protocols"
+    ] ;
+    sh:property [
+        sh:path dcpm:ipAddress ;
+        sh:minCount 1 ;
+        sh:datatype xsd:string ;
+        sh:name "IP Address" ;
+        sh:description "Gateway must have a network address"
+    ] ;
+    sh:property [
+        sh:path dcpm:connectedTo ;
+        sh:or (
+            [ sh:class dcpm:ControllerType ]
+            [ sh:class dcpm:PowerDeviceType ]
+        ) ;
+        sh:name "connectedTo target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasLocation ;
+        sh:class dcpm:ElectricalRoom ;
+        sh:name "hasLocation target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasDocument ;
+        sh:class dcpm:Document ;
+        sh:name "hasDocument target" ;
+    ] .
+
+
+# ========================================
+# Physical Space Shapes
+# ========================================
+
+dcpm:ElectricalRoomShape a sh:NodeShape ;
+    sh:targetClass dcpm:ElectricalRoom ;
+    sh:name "Electrical Room Shape" ;
+
+    sh:property [
+        sh:path dcpm:containsEquipment ;
+        sh:or (
+            [ sh:class dcpm:SwitchgearType ]
+            [ sh:class dcpm:TransformerType ]
+            [ sh:class dcpm:UPSType ]
+            [ sh:class dcpm:PDUType ]
+            [ sh:class dcpm:ATSType ]
+            [ sh:class dcpm:ControllerType ]
+            [ sh:class dcpm:GatewayType ]
+            [ sh:class dcpm:PQMeterType ]
+            [ sh:class dcpm:SPDType ]
+        ) ;
+        sh:name "containsEquipment target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:isLocationOf ;
+        sh:class dcpm:PowerDeviceType ;
+        sh:name "isLocationOf target" ;
+    ] .
+
+dcpm:DataHallShape a sh:NodeShape ;
+    sh:targetClass dcpm:DataHall ;
+    sh:name "Data Hall Shape" ;
+
+    sh:property [
+        sh:path dcpm:containsEquipment ;
+        sh:or (
+            [ sh:class dcpm:ITRackType ]
+            [ sh:class dcpm:RackPDUType ]
+            [ sh:class dcpm:BuswayType ]
+            [ sh:class dcpm:PDUType ]
+            [ sh:class dcpm:RPPType ]
+        ) ;
+        sh:name "containsEquipment target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:isLocationOf ;
+        sh:class dcpm:PowerDeviceType ;
+        sh:name "isLocationOf target" ;
+    ] .
+
+dcpm:BatteryRoomShape a sh:NodeShape ;
+    sh:targetClass dcpm:BatteryRoom ;
+    sh:name "Battery Room Shape" ;
+
+    sh:property [
+        sh:path dcpm:containsEquipment ;
+        sh:or (
+            [ sh:class dcpm:BESSType ]
+            [ sh:class dcpm:BMSType ]
+        ) ;
+        sh:name "containsEquipment target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:isLocationOf ;
+        sh:class dcpm:PowerDeviceType ;
+        sh:name "isLocationOf target" ;
+    ] .
+
+dcpm:GeneratorYardShape a sh:NodeShape ;
+    sh:targetClass dcpm:GeneratorYard ;
+    sh:name "Generator Yard Shape" ;
+
+    sh:property [
+        sh:path dcpm:containsEquipment ;
+        sh:class dcpm:GeneratorSetType ;
+        sh:name "containsEquipment target" ;
+    ] .
+
+dcpm:GeneratorRoomShape a sh:NodeShape ;
+    sh:targetClass dcpm:GeneratorRoom ;
+    sh:name "Generator Room Shape" ;
+
+    sh:property [
+        sh:path dcpm:containsEquipment ;
+        sh:class dcpm:GeneratorSetType ;
+        sh:name "containsEquipment target" ;
+    ] .
+
+
+# ========================================
+# Telemetry Shapes
+# ========================================
+
+dcpm:TelemetryPointShape a sh:NodeShape ;
+    sh:targetClass dcpm:TelemetryPoint ;
+    sh:name "Telemetry Point Shape" ;
+
+    sh:property [
+        sh:path dcpm:isTelemetryOf ;
+        sh:or (
+            [ sh:class dcpm:PowerDeviceType ]
+            [ sh:class dcpm:TelemetryStream ]
+        ) ;
+        sh:name "isTelemetryOf target" ;
+    ] ;
+    sh:property [
+        sh:path dcpm:hasPhase ;
+        sh:class dcpm:Phase ;
+        sh:maxCount 1 ;
+        sh:name "hasPhase target" ;
+        sh:description "A telemetry point is associated with at most one electrical phase."
+    ] .
+
+dcpm:TelemetryStreamShape a sh:NodeShape ;
+    sh:targetClass dcpm:TelemetryStream ;
+    sh:name "Telemetry Stream Shape" ;
+
+    sh:property [
+        sh:path dcpm:isTelemetryStreamOf ;
+        sh:class dcpm:PowerDeviceType ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:name "isTelemetryStreamOf target" ;
+        sh:description "A telemetry stream belongs to exactly one power device."
+    ] ;
+    sh:property [
+        sh:path dcpm:hasTelemetryPoint ;
+        sh:class dcpm:TelemetryPoint ;
+        sh:name "hasTelemetryPoint target" ;
+        sh:description "A stream contains one or more telemetry points."
+    ] .
