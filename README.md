@@ -1,11 +1,11 @@
-# Data Center Standard Power System Management Ontologies
+# WattSchema - Standard Power System Management Ontologies
 
 Open-source ontologies for modeling data center power infrastructure, utility billing, and energy optimization, for both RDF and Microsoft Fabric.
 
 
-## DCPM (Data Center Power Management)
+## WattSChema
 
-The DCPM ontology, initially developed by [Hanwha Q CELLS](https://qcells.com/), provides a semantic model for **mission-critical power infrastructure** in data centers. It covers:
+The WattSchema ontology, initially developed by [Hanwha Q CELLS](https://qcells.com/), provides a semantic model for **mission-critical power infrastructure** in data centers. It covers:
 
 - **Power distribution** -- Switchgear, transformers, UPS, BESS, ATS/STS, PDUs, rack PDUs, busbars, generators
 - **Telemetry and measurement** -- 40+ measurement types (power, energy, voltage, current, battery metrics, harmonics, temperature)
@@ -13,6 +13,8 @@ The DCPM ontology, initially developed by [Hanwha Q CELLS](https://qcells.com/),
 - **Control and protection** -- Setpoints, controllers, KPIs, surge protection
 - **Grid interconnection** -- Points of interconnection (POI), import/export limits
 - **Value streams** -- Energy arbitrage, demand charge management, incentive programs
+
+The WattSchema was known as the DCPM ontology during its development and we have not yet finished all the changes to its new name.
 
 ## Standards Alignment
 
@@ -30,8 +32,8 @@ The ontology is built on and interoperate with established standards:
 ## Repository Structure
 
 ```
-DCPM/ontology/
-  DCPM_Core/                  # Core power management ontology in RDF, along with a few extensions to Brick  
+WattSchema/ontology/
+  WattSchema_Core/            # Core power management ontology in RDF, along with a few extensions to Brick  
   example_models/             # Instance data (mock data centers)
   document/                   # Ontology documentation and glossaries
   shacl_profiles/             # An example SHACL profile that is suitable for some (but not all) applications
@@ -49,8 +51,8 @@ scripts/                      # Validation tooling (Python). RDF only, for now.
 ### Setup
 
 ```bash
-git clone https://github.com/dcpm-ontology/dcpm-ontology
-cd dcpm-ontology
+git clone https://github.com/WattSchema/WattSchema
+cd WattSchema
 
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
@@ -68,11 +70,11 @@ make validate
 make validate-verbose
 
 # Validate a single file
-python scripts/validate_rdf.py --file DCPM/ontology/DCPM_Core/DataCenterPowerManagement_Ontology_CORE.ttl
+python scripts/validate_rdf.py --file WattSchema/ontology/WattSchema_Core/WattSchema_CORE.ttl
 
 # SHACL validation against a specific profile
 python scripts/validate_rdf.py \
-   --file DCPM/example_models/simple_mock_dc.ttl \
+   --file WattSchema/example_models/simple_mock_dc.ttl \
    --validator shacl \
    --shacl-shapes your/site/specific/rules.ttl
 ```
@@ -104,16 +106,16 @@ SELECT ?point ?label WHERE {
 ```
 
 ## Microsoft Fabric Support
-[Microsoft Fabric Ontology](https://learn.microsoft.com/en-us/fabric/iq/ontology/overview) is a new offering from Microsoft that has recently entered preview, and is a target for the DCPM ontology. 
-We are still early days with it, and we have provided SQL Table definitions suitable for a large subset of DCPM. 
+[Microsoft Fabric Ontology](https://learn.microsoft.com/en-us/fabric/iq/ontology/overview) is a new offering from Microsoft that has recently entered preview, and is a target for the WattSchema ontology. 
+We are still early days with it, and we have provided SQL Table definitions suitable for a large subset of WattSchema. 
 Fabric is largely driven from the Fabric Portal right now, but as Fabric Ontology matures we will provide additional support to make it easy to use the REST APIs to create a Fabric Ontology overlay for those tables.
 
 ## Documentation
 
 | Document | Description |
 |----------|-------------|
-| [DCPM Core Overview](DCPM/ontology/document/DCPM_Ontology_CORE_OVERVIEW.md) | Full reference for all DCPM classes, properties, and relationships |
-| [DCPM Glossary](DCPM/ontology/document/DCPM_Ontology_Glossary_v0.1.md) | Term definitions for all DCPM entities |
+| [WattSchema Core Overview](WattSchema/ontology/document/WattSchema_CORE_OVERVIEW.md) | Full reference for all WattSchema classes, properties, and relationships |
+| [WattSchema Glossary](WattSchema/ontology/document/WattSchema_Ontology_Glossary_v0.1.md) | Term definitions for all WattSchema entities |
 
 ## Validation
 
@@ -123,13 +125,12 @@ This repository includes automated validation using both **RDF parse checking** 
 
 | Rule | Type | Description |
 |------|------|-------------|
-| DCPM Core Ontologies | Parse | Core power management ontology files |
-| DCPM Example Models | Parse | Example instance data |
-| DCPM Simple Mock (v1 SHACL) | SHACL | Validates `simple_mock_dc.ttl` against the optimization profile |
+| Watt Schema Core Ontologies | Parse | Core power management ontology files |
+| Watt Schema Simple Mock (v1 SHACL) | SHACL | Validates `simple_mock_dc.ttl` against the optimization profile |
 
 ### SHACL Profiles
 
-SHACL profiles in `DCPM/ontology/shacl_profiles/` define possible **application-specific validation constraints**:
+SHACL profiles in `WattSchema/ontology/shacl_profiles/` define possible **application-specific validation constraints**:
 
 It is important to distinguish between different uses of SHACL:
 - **Ontology-level constraints** -- Rules intrinsic to ontology semantics that apply to all users

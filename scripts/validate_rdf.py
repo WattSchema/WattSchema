@@ -32,22 +32,22 @@ class ValidationRule:
 # This is the source of truth for which files get validated and how
 VALIDATION_RULES = [
     ValidationRule(
-        name="DCPM Core Ontologies",
+        name="WattSchema Core Ontologies",
         files=[
-            "DCPM/ontology/DCPM_Core/DataCenterPowerManagement_Ontology_CORE.ttl"
+            "WattSchema/ontology/WattSchema_Core/WattSchema_CORE.ttl"
         ],
         validator_type="parse"
     ),
     ValidationRule(
-        name="DCPM Simple Mock (v1 SHACL)",
+        name="WattSchema Simple Mock (v1 SHACL)",
         files=[
-            "DCPM/ontology/example_models/simple_mock_dc.ttl",
+            "WattSchema/ontology/example_models/simple_mock_dc.ttl",
         ],
         validator_type="shacl",
-        shacl_shapes=["DCPM/ontology/shacl_profiles/example_profile/example_profile_shacl.ttl",
-                      "DCPM/ontology/DCPM_Core/DataCenterPowerManagement_Ontology_CORE.ttl"],
-        ont_files=["DCPM/ontology/DCPM_Core/DataCenterPowerManagement_Ontology_CORE.ttl",
-                   "DCPM/ontology/DCPM_Core/DCPM_Brick_Ext.ttl"],
+        shacl_shapes=["WattSchema/ontology/shacl_profiles/example_profile/example_profile_shacl.ttl",
+                      "WattSchema/ontology/WattSchema_Core/WattSchema_CORE.ttl"],
+        ont_files=["WattSchema/ontology/WattSchema_Core/WattSchema_CORE.ttl",
+                   "WattSchema/ontology/WattSchema_Core/WattSchema_Brick_Ext.ttl"],
     ),
 ]
 
