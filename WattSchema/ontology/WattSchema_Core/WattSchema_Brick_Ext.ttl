@@ -1,4 +1,4 @@
-@prefix dcpm_brick: <http://qcells.io/ontologies/DCPM_Brick_Extension#> .
+@prefix wsch_brick: <http://qcells.io/ontologies/DCPM_Brick_Extension#> .
 @prefix brick: <https://brickschema.org/schema/Brick#> .
 @prefix bsh: <https://brickschema.org/schema/BrickShape#> .
 @prefix rec: <https://brickschema.org/schema/Brick/extension/rec#> .
@@ -21,13 +21,13 @@ bsh:NumericValue a rdf:List ;
 
 # IT Infrastructure Classes
 
-dcpm_brick:Hot_Aisle a owl:Class ;
+wsch_brick:Hot_Aisle a owl:Class ;
     rdfs:subClassOf rec:HVACZone,
         s223:PhysicalSpace ;
     rdfs:label "Hot Aisle" ;
     rdfs:comment "An aisle in a data center where hot air is circulated" .
 
-dcpm_brick:Cold_Aisle a owl:Class ;
+wsch_brick:Cold_Aisle a owl:Class ;
     rdfs:subClassOf rec:HVACZone,
         s223:PhysicalSpace ;
     rdfs:label "Cold Aisle" ;
@@ -35,18 +35,18 @@ dcpm_brick:Cold_Aisle a owl:Class ;
 
 # System Classes
 
-dcpm_brick:Chiller_Plant a owl:Class ;
+wsch_brick:Chiller_Plant a owl:Class ;
     rdfs:subClassOf brick:System ;
     rdfs:label "Chiller Plant" ;
     rdfs:comment "A chiller plant system consisting of chillers, headers, and associated equipment" .
 
-dcpm_brick:Chiller_Plant_Header a owl:Class ;
+wsch_brick:Chiller_Plant_Header a owl:Class ;
     rdfs:subClassOf s223:Junction ;
     rdfs:label "Chiller Plant Header" ;
     rdfs:comment "A header (junction) in the chiller plant that distributes chilled or condenser water" .
 
 # New sensor classes
-dcpm_brick:Condenser_Water_Approach_Temperature_Sensor a owl:Class;
+wsch_brick:Condenser_Water_Approach_Temperature_Sensor a owl:Class;
     rdfs:label "Condenser Water Approach Temperature Sensor"@en ;
     rdfs:subClassOf brick:Condenser_Water_Temperature_Sensor,
         brick:Differential_Temperature_Sensor ;
@@ -54,14 +54,14 @@ dcpm_brick:Condenser_Water_Approach_Temperature_Sensor a owl:Class;
     brick:hasQuantity brick:Differential_Temperature ;
     brick:hasSubstance brick:Condenser_Water .
 
-dcpm_brick:Cooling_Thermal_Power_Sensor a owl:Class;
+wsch_brick:Cooling_Thermal_Power_Sensor a owl:Class;
     rdfs:label "Cooling Thermal Power Sensor"@en ;
     rdfs:subClassOf brick:Thermal_Power_Sensor ;
     skos:definition "Measures the rate of thermal energy removal by a cooling process, typically expressed in units of power (e.g., kW, tons, Btu/h)."@en ;
     brick:hasQuantity qudtqk:Power .
 
 # these are pretty rare since COP is usually calculated, but you can in theory expose it as a point and we have seen it used, so add it in our extension
-dcpm_brick:Coefficient_Of_Performance_Sensor a owl:Class ;
+wsch_brick:Coefficient_Of_Performance_Sensor a owl:Class ;
     rdfs:label "Coefficient of Performance Sensor"@en ;
     rdfs:subClassOf brick:Sensor ;
     skos:definition "Measures the coefficient of performance (COP) of a system, defined as the ratio of useful thermal energy transfer to the required input energy."@en ;
@@ -69,42 +69,42 @@ dcpm_brick:Coefficient_Of_Performance_Sensor a owl:Class ;
 
 # Properties
 
-dcpm_brick:maxLoad a owl:DatatypeProperty ;
+wsch_brick:maxLoad a owl:DatatypeProperty ;
     rdfs:label "Maximum Load" ;
     rdfs:comment "Maximum power consumption of the equipment under full load" ;
     rdfs:range xsd:decimal .
 
-dcpm_brick:ratedAirFlowCapacity a owl:DatatypeProperty ;
+wsch_brick:ratedAirFlowCapacity a owl:DatatypeProperty ;
     rdfs:label "Rated Air Flow Parameter"@en ;
     skos:definition "The rated air flow for an AHU, used for calculating the maximum supply air flow setpoint limit"@en .
 
-dcpm_brick:ratedWaterFlowCapacity a owl:DatatypeProperty ;
+wsch_brick:ratedWaterFlowCapacity a owl:DatatypeProperty ;
     rdfs:label "Rated Water Flow Parameter"@en ;
     skos:definition "The rated water flow for a piece of equipment, used for calculating the maximum water flow setpoint limit"@en .
 
-dcpm_brick:minimumFlowFraction a owl:DatatypeProperty ;
+wsch_brick:minimumFlowFraction a owl:DatatypeProperty ;
     rdfs:label "Minimum Flow Fraction Parameter"@en ;
     skos:definition "The minimum flow fraction for a piece of equipment, used for calculating the minimum water or air flow setpoint limit as a fraction of the rated flow capacity. A number between 0 and 1"@en ;
     rdfs:range xsd:decimal .
 
-dcpm_brick:minimumPartLoadRatio a owl:DatatypeProperty ;
+wsch_brick:minimumPartLoadRatio a owl:DatatypeProperty ;
     rdfs:label "Minimum Chiller Part Load Ratio Parameter"@en ;
     skos:definition "The minimum part load ratio for a chiller, used for calculating the minimum water flow setpoint limit as a fraction of the rated flow capacity. A number between 0 and 1"@en ;
     rdfs:range xsd:decimal .
 
-dcpm_brick:aggregatesClass a owl:ObjectProperty ;
+wsch_brick:aggregatesClass a owl:ObjectProperty ;
     rdfs:label "Aggregates Class" ;
     rdfs:comment "The class that all member points of an aggregate must instantiate" ;
-    rdfs:domain dcpm_brick:AggregatePoint .
+    rdfs:domain wsch_brick:AggregatePoint .
 
-dcpm_brick:aggregationSemantics a owl:DatatypeProperty ;
+wsch_brick:aggregationSemantics a owl:DatatypeProperty ;
     rdfs:label "Aggregation Semantics" ;
     rdfs:comment "Describes the type of aggregation: 'snapshot' for instantaneous spatial aggregation across multiple sensors" ;
     rdfs:range rdfs:Literal .
 
 # Aggregate Point Class
 
-dcpm_brick:AggregatePoint a owl:Class ;
+wsch_brick:AggregatePoint a owl:Class ;
     rdfs:subClassOf brick:Point ;
     rdfs:label "Aggregate Point" ;
     rdfs:comment "A virtual sensor point that aggregates values from multiple physical sensors at the same point in time (spatial aggregation)" .
@@ -113,7 +113,7 @@ dcpm_brick:AggregatePoint a owl:Class ;
 # Note that Brick has some parameter/limit classes and defines them as subclasses of point, but hasPoint is only supposed to apply to equipment or spaces
 # so we're going to add a new relationship, hasParameter, to link points to their parameters (which are also points, though I hope that Brick revisits that) 
 
-dcpm_brick:hasParameter a owl:AsymmetricProperty,
+wsch_brick:hasParameter a owl:AsymmetricProperty,
         owl:IrreflexiveProperty,
         owl:ObjectProperty,
         brick:Relationship ;
@@ -121,50 +121,50 @@ dcpm_brick:hasParameter a owl:AsymmetricProperty,
     owl:inverseOf brick:isParameterOf ;
     skos:definition "The subject is a source of telemetry, and the object is a parameter of that source, for example, the minimum allowable value of a setpoint. For now, this only applies to points. In some systems the source of telemetry may be represented as a digital/analog input/output point"@en .
 
-dcpm_brick:isParameterOf a owl:AsymmetricProperty,
+wsch_brick:isParameterOf a owl:AsymmetricProperty,
         owl:IrreflexiveProperty,
         owl:ObjectProperty,
         brick:Relationship ;
     rdfs:label "Is parameter of"@en ;
-    owl:inverseOf dcpm_brick:hasParameter ;
+    owl:inverseOf wsch_brick:hasParameter ;
     skos:definition "The subject is a parameter of the object, and the object is a source of telemetry. For example, the minimum allowable value of a setpoint. For now, this only applies to points. In some systems the source of telemetry may be represented as a digital/analog input/output point"@en .
 
 # New parameter classes
-dcpm_brick:Max_Supply_Water_Temperature_Ramp_Rate a owl:Class ;
+wsch_brick:Max_Supply_Water_Temperature_Ramp_Rate a owl:Class ;
     rdfs:subClassOf brick:Parameter ;
     rdfs:label "Supply Water Temperature Ramp Rate" ;
     rdfs:comment "The maximum allowable rate of change for the supply water temperature setpoint" .
 
-dcpm_brick:Min_Water_Flow_Setpoint_Limit a owl:Class;
+wsch_brick:Min_Water_Flow_Setpoint_Limit a owl:Class;
     rdfs:label "Min Water Flow Setpoint Limit"@en ;
     rdfs:subClassOf brick:Limit,
         brick:Min_Limit ;
     skos:definition "A parameter that places a lower bound on the range of permitted values of a Water_Flow_Setpoint."@en .
 
-dcpm_brick:Max_Water_Flow_Setpoint_Limit a owl:Class;
+wsch_brick:Max_Water_Flow_Setpoint_Limit a owl:Class;
     rdfs:label "Max Water Flow Setpoint Limit"@en ;
     rdfs:subClassOf brick:Limit,
         brick:Max_Limit ;
     skos:definition "A parameter that places an upper bound on the range of permitted values of a Water_Flow_Setpoint."@en .
 
-dcpm_brick:Min_Water_Approach_Temperature_Limit a owl:Class;
+wsch_brick:Min_Water_Approach_Temperature_Limit a owl:Class;
     rdfs:label "Min Water Approach Temperature Limit"@en ;
     rdfs:subClassOf brick:Limit,
         brick:Min_Limit ;
     skos:definition "A parameter that places a lower bound on the approach temperature of water-based heat exchangers. (condenser water supply temperature must be at least outdoor wet-bulb plus this value). Typically small (5-7 degrees F)" .
 
-dcpm_brick:Max_Supply_Air_Temperature_Ramp_Rate a owl:Class ;
+wsch_brick:Max_Supply_Air_Temperature_Ramp_Rate a owl:Class ;
     rdfs:subClassOf brick:Parameter ;
     rdfs:label "Supply Air Temperature Ramp Rate" ;
     rdfs:comment "The maximum allowable rate of change for the supply air temperature setpoint" .
 
-dcpm_brick:Min_Temperature_Operational_Limit a owl:Class ;
+wsch_brick:Min_Temperature_Operational_Limit a owl:Class ;
     rdfs:label "Min Temperature Operational Limit"@en ;
     rdfs:subClassOf brick:Min_Limit,
         brick:Temperature_Parameter ;
     rdfs:comment "A parameter that places a lower bound on the range of permitted values of observed temperature" .
 
-dcpm_brick:Max_Temperature_Operational_Limit a owl:Class;
+wsch_brick:Max_Temperature_Operational_Limit a owl:Class;
     rdfs:label "Max Temperature Operational Limit"@en ;
     rdfs:subClassOf brick:Max_Limit,
         brick:Temperature_Parameter ;
@@ -173,14 +173,14 @@ dcpm_brick:Max_Temperature_Operational_Limit a owl:Class;
 
 # SHACL Shapes - only for items defined in this extension. The site-specific rules (e.g. chillers must have the at least this set of points) is in the shacl_profiles/ directory
 
-dcpm_brick:AggregatePointShape a sh:NodeShape ;
-    sh:targetClass dcpm_brick:AggregatePoint ;
+wsch_brick:AggregatePointShape a sh:NodeShape ;
+    sh:targetClass wsch_brick:AggregatePoint ;
     sh:name "Aggregate Point Shape for DCPM" ;
     sh:description "SHACL shape defining required properties and constraints for aggregate points" ;
     
     # Required: aggregatesClass property
     sh:property [
-        sh:path dcpm_brick:aggregatesClass ;
+        sh:path wsch_brick:aggregatesClass ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
         sh:nodeKind sh:IRI ;
@@ -190,7 +190,7 @@ dcpm_brick:AggregatePointShape a sh:NodeShape ;
     
     # Required: aggregationSemantics property (with value "snapshot")
     sh:property [
-        sh:path dcpm_brick:aggregationSemantics ;
+        sh:path wsch_brick:aggregationSemantics ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
         sh:hasValue "snapshot" ;
@@ -220,12 +220,12 @@ dcpm_brick:AggregatePointShape a sh:NodeShape ;
     sh:sparql [
         a sh:SPARQLConstraint ;
         sh:message "All members referenced by brick:hasPart must be instances of the aggregatesClass" ;
-        sh:prefixes dcpm_brick: ;
+        sh:prefixes wsch_brick: ;
         sh:prefixes brick: ;
         sh:select """
             SELECT $this
             WHERE {
-                $this dcpm_brick:aggregatesClass ?class .
+                $this wsch_brick:aggregatesClass ?class .
                 $this brick:hasPart ?member .
                 FILTER NOT EXISTS { ?member a ?class }
             }
@@ -233,7 +233,7 @@ dcpm_brick:AggregatePointShape a sh:NodeShape ;
     ] .
 
 
-dcpm_brick:Water_Flow_CapacityQuantityShape a owl:Class,
+wsch_brick:Water_Flow_CapacityQuantityShape a owl:Class,
         sh:NodeShape,
         brick:EntityPropertyValue ;
     rdfs:subClassOf bsh:ValueShape ;
@@ -248,7 +248,7 @@ dcpm_brick:Water_Flow_CapacityQuantityShape a owl:Class,
             sh:minCount 1 ;
             sh:path brick:hasUnit ] .
 
-dcpm_brick:Air_Flow_CapacityQuantityShape a owl:Class,
+wsch_brick:Air_Flow_CapacityQuantityShape a owl:Class,
         sh:NodeShape,
         brick:EntityPropertyValue ;
     rdfs:subClassOf bsh:ValueShape ;
