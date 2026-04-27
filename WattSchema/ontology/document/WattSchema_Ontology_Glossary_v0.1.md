@@ -1,21 +1,15 @@
-# Data Center Power Management Ontology (DCPM) — Glossary v0.1
-
-**Project:** Data Center Power Management Ontology (DCPM)  
-**Date:** November 2025  
-**Version:** v0.1
-
----
+# WattSchema — Glossary v0.1
 
 ## Purpose
-This glossary provides a unified terminology reference for the **Data Center Power Management (DCPM) Ontology**, which models the power infrastructure of mission-critical data centers.  
+This glossary provides a unified terminology reference for the **Watt Schema Ontology**, which models the power infrastructure of mission-critical data centers.  
 It ensures consistent semantic usage across engineering, operations, telemetry ingestion, analytics, and interoperability frameworks.
 
 ## Scope
-This document summarizes all **Classes, Object Properties, Data Properties, and Enumerations** defined in the final **DCPM Core Ontology v1.1**.  
+This document summarizes all **Classes, Object Properties, Data Properties, and Enumerations** defined in the final **Watt Schema Core Ontology v1.0**.  
 Additional enums used only in **simulation or PoC** contexts are categorized separately.
 
 ## Standards Alignment
-DCPM aligns with widely adopted standards:
+WattSchema aligns with widely adopted standards:
 
 - **Brick Schema** – building and electrical system modeling  
 - **ASHRAE 223P** – semantic tagging and interoperability  

@@ -93,14 +93,14 @@ The ontologies are in standard [Turtle](https://www.w3.org/TR/turtle/) format (`
 ```sparql
 # Find all power equipment types
 SELECT ?device ?label WHERE {
-  ?device rdfs:subClassOf* dcpm:PowerDeviceType .
+  ?device rdfs:subClassOf* wattsch:PowerDeviceType .
   ?device rdfs:label ?label .
 }
 
 # Find all measurement types for a UPS
 SELECT ?point ?label WHERE {
-  ?ups a dcpm:UPSType .
-  ?ups dcpm:hasTelemetryPoint ?point .
+  ?ups a wattsch:UPSType .
+  ?ups wattsch:hasTelemetryPoint ?point .
   ?point rdfs:label ?label .
 }
 ```
