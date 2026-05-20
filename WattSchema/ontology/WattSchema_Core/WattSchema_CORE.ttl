@@ -469,6 +469,11 @@ wattsch:maxLoad a owl:DatatypeProperty ;
 # ========================================
 # Static Properties for Identifiers
 # ========================================
+wattsch:upstreamId a owl:DatatypeProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "Upstream Identifier" ;
+    rdfs:comment "Identifier shared between downstream and upstream layers so that the same reference is used consistently as data flows from the source to upstream systems, preserving identity alignment and data integrity across both sides." .
+
 wattsch:siteId a owl:DatatypeProperty ;
     rdfs:range xsd:string ;
     rdfs:label "Site Identifier" ;
