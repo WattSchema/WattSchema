@@ -45,6 +45,18 @@ wsch_brick:Chiller_Plant_Header a owl:Class ;
     rdfs:label "Chiller Plant Header" ;
     rdfs:comment "A header (junction) in the chiller plant that distributes chilled or condenser water" .
 
+# Equipment Classes
+
+wsch_brick:Air_Dirt_Separator a owl:Class ;
+    rdfs:subClassOf brick:HVAC_Equipment ;
+    rdfs:label "Air Dirt Separator" ;
+    rdfs:comment "A piece of HVAC equipment that removes entrained air and suspended particulates from chilled, hot, or condenser water in a hydronic loop" .
+
+wsch_brick:Coolant_Distribution_Unit a owl:Class ;
+    rdfs:subClassOf brick:HVAC_Equipment ;
+    rdfs:label "Coolant Distribution Unit" ;
+    rdfs:comment "An HVAC equipment that delivers controlled-temperature coolant from a secondary technology loop to IT rack cold plates and other direct liquid cooling components, exchanging heat with the facility's primary chilled water loop" .
+
 # New sensor classes
 wsch_brick:Condenser_Water_Approach_Temperature_Sensor a owl:Class;
     rdfs:label "Condenser Water Approach Temperature Sensor"@en ;
