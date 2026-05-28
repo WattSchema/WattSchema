@@ -1180,6 +1180,64 @@ wattsch:ATSTransferCount a owl:Class ;
   qudt:applicableUnit unit:COUNT ;
   rdfs:comment "Cumulative count of transfer operations performed by an Automatic Transfer Switch." .
 
+
+# ==========================================
+# Parameters for Set point / Control points
+# ==========================================
+wattsch:MaxActivePowerSetpointLimit a owl:Class ;
+  rdfs:label "Max Active Power Setpoint Limit" ;
+  rdfs:subClassOf brick:Max_Limit ;
+  qudt:quantityKind quantityKind:ActivePower ;
+  qudt:applicableUnit unit:KiloW,
+                      unit:MegaW,
+                      unit:W ;
+  rdfs:comment "Maximum limit for active power setpoint values." .
+
+wattsch:MinActivePowerSetpointLimit a owl:Class ;
+  rdfs:label "Min Active Power Setpoint Limit" ;
+  rdfs:subClassOf brick:Min_Limit ;
+  qudt:quantityKind quantityKind:ActivePower ;
+  qudt:applicableUnit unit:KiloW,
+                      unit:MegaW,
+                      unit:W ;
+  rdfs:comment "Minimum limit for active power setpoint values." .
+
+wattsch:MaxChargePowerSetpointLimit a owl:Class ;
+  rdfs:label "Max Charge Power Setpoint Limit" ;
+  rdfs:subClassOf brick:Max_Limit ;
+  qudt:quantityKind quantityKind:ActivePower ;
+  qudt:applicableUnit unit:KiloW,
+                      unit:MegaW,
+                      unit:W ;
+  rdfs:comment "Maximum limit for charge power setpoint values." .
+
+wattsch:MinChargePowerSetpointLimit a owl:Class ;
+  rdfs:label "Min Charge Power Setpoint Limit" ;
+  rdfs:subClassOf brick:Min_Limit ;
+  qudt:quantityKind quantityKind:ActivePower ;
+  qudt:applicableUnit unit:KiloW,
+                      unit:MegaW,
+                      unit:W ;
+  rdfs:comment "Minimum limit for charge power setpoint values." .
+
+wattsch:MaxDischargePowerSetpointLimit a owl:Class ;
+  rdfs:label "Max Discharge Power Setpoint Limit" ;
+  rdfs:subClassOf brick:Max_Limit ;
+  qudt:quantityKind quantityKind:ActivePower ;
+  qudt:applicableUnit unit:KiloW,
+                      unit:MegaW,
+                      unit:W ;
+  rdfs:comment "Maximum limit for discharge power setpoint values." .
+
+wattsch:MinDischargePowerSetpointLimit a owl:Class ;
+  rdfs:label "Min Discharge Power Setpoint Limit" ;
+  rdfs:subClassOf brick:Min_Limit ;
+  qudt:quantityKind quantityKind:ActivePower ;
+  qudt:applicableUnit unit:KiloW,
+                      unit:MegaW,
+                      unit:W ;
+  rdfs:comment "Minimum limit for discharge power setpoint values." .
+
 # ========================================
 # Rated Properties for PowerDeviceType
 # ========================================
