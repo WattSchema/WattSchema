@@ -200,6 +200,12 @@ wattsch:GroundingNetworkType a owl:Class ;
   rdfs:comment "Represents the monitoring points of the facility grounding system." ;
   rdfs:subClassOf wattsch:PowerDeviceType .
 
+wattsch:MeterType a owl:Class ;
+  rdfs:subClassOf brick:Meter ;
+  rdfs:subClassOf wattsch:PowerDeviceType ;
+  rdfs:label "Meter" ;
+  rdfs:comment "Device that measures usage or consumption." .
+
 wattsch:UtilityMeterType a owl:Class ;
   rdfs:subClassOf s223:ElectricityMeter ;
   rdfs:subClassOf brick:Electrical_Meter ;
@@ -210,6 +216,28 @@ wattsch:ITRackType a owl:Class ;
   rdfs:subClassOf brick:ICT_Equipment ;
   rdfs:subClassOf wattsch:PowerDeviceType ;
   rdfs:label "IT Rack" .
+
+wattsch:CircuitBreakerType a owl:Class ;
+  owl:equivalentClass brick:Circuit_Breaker ;
+  rdfs:subClassOf wattsch:PowerDeviceType ;
+  rdfs:label "Circuit Breaker" ;
+  rdfs:comment "Represents an individual circuit breaker." .
+
+wattsch:RelayType a owl:Class ;
+  owl:equivalentClass brick:Relay ;
+  rdfs:subClassOf wattsch:PowerDeviceType ;
+  rdfs:label "Relay" ;
+  rdfs:comment "Electrically operated switching device used to control circuits or to detect abnormal conditions and initiate protective actions." .
+
+wattsch:PanelboardType a owl:Class ;
+  rdfs:subClassOf wattsch:PowerDeviceType ;
+  rdfs:label "Panelboard" ;
+  rdfs:comment "Distribution panel that houses branch circuit breakers and distributes electrical power from an upstream feeder to multiple downstream branch circuits." .
+
+wattsch:SwitchboardType a owl:Class ;
+  rdfs:subClassOf wattsch:PowerDeviceType ;
+  rdfs:label "Switchboard" ;
+  rdfs:comment "Represents a main electrical distribution assembly that receives power from an upstream source and feeds downstream." .
 
 # ========================================
 # Common Structures and classes
