@@ -57,6 +57,11 @@ wsch_brick:Coolant_Distribution_Unit a owl:Class ;
     rdfs:label "Coolant Distribution Unit" ;
     rdfs:comment "An HVAC equipment that delivers controlled-temperature coolant from a secondary technology loop to IT rack cold plates and other direct liquid cooling components, exchanging heat with the facility's primary chilled water loop" .
 
+wsch_brick:Evaporator a owl:Class ;
+    rdfs:subClassOf brick:Heat_Exchanger ;
+    rdfs:label "Evaporator" ;
+    rdfs:comment "A heat exchanger in which the refrigerant absorbs heat from the medium being cooled (e.g., chilled water or air) and evaporates. In a chiller, it cools the chilled water loop" .
+
 # New sensor classes
 wsch_brick:Condenser_Water_Approach_Temperature_Sensor a owl:Class;
     rdfs:label "Condenser Water Approach Temperature Sensor"@en ;
