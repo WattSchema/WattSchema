@@ -45,6 +45,11 @@ wsch_brick:Chiller_Plant_Header a owl:Class ;
     rdfs:label "Chiller Plant Header" ;
     rdfs:comment "A header (junction) in the chiller plant that distributes chilled or condenser water" .
 
+wsch_brick:Air_Header a owl:Class ;
+    rdfs:subClassOf s223:Junction ;
+    rdfs:label "Air Header" ;
+    rdfs:comment "A header (junction) that mediates air distribution between air-handling equipment (e.g., AHU, CRAH) and conditioned spaces (e.g., Cold Aisle, Hot Aisle). Because equipment fans are not dedicated to a single aisle, equipment and spaces share a common air path in an N:M relationship; the Air_Header represents that shared junction, decoupling the direct N:M feeds/isFedBy relationships into N:1 + 1:M through the junction." .
+
 # Equipment Classes
 
 wsch_brick:Air_Dirt_Separator a owl:Class ;
