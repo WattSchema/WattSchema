@@ -104,6 +104,10 @@ wsch_brick:ratedWaterFlowCapacity a owl:DatatypeProperty ;
     rdfs:label "Rated Water Flow Parameter"@en ;
     skos:definition "The rated water flow for a piece of equipment, used for calculating the maximum water flow setpoint limit"@en .
 
+wsch_brick:ratedHead a owl:DatatypeProperty ;
+    rdfs:label "Rated Head (total dynamic head)"@en ;
+    skos:definition "The rated/design total dynamic head a pump or other hydraulic equipment is sized for, expressed as head of water (e.g. ft H2O). Used for pump staging and flow balancing in a chilled-water loop. Excludes NPSH."@en .
+
 wsch_brick:minimumFlowFraction a owl:DatatypeProperty ;
     rdfs:label "Minimum Flow Fraction Parameter"@en ;
     skos:definition "The minimum flow fraction for a piece of equipment, used for calculating the minimum water or air flow setpoint limit as a fraction of the rated flow capacity. A number between 0 and 1"@en ;
