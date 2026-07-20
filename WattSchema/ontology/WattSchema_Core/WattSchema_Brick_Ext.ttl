@@ -118,6 +118,20 @@ wsch_brick:minimumPartLoadRatio a owl:DatatypeProperty ;
     skos:definition "The minimum part load ratio for a chiller, used for calculating the minimum water flow setpoint limit as a fraction of the rated flow capacity. A number between 0 and 1"@en ;
     rdfs:range xsd:decimal .
 
+wsch_brick:maximumPartLoadRatio a owl:DatatypeProperty ;
+    rdfs:label "Maximum Chiller Part Load Ratio Parameter"@en ;
+    skos:definition "The maximum part load ratio for a chiller, used for calculating the maximum water flow setpoint limit as a fraction of the rated flow capacity. A number between 0 and 1"@en ;
+    rdfs:range xsd:decimal .
+
+wsch_brick:ratedPressureDrop a owl:DatatypeProperty ;
+    rdfs:label "Rated Pressure Drop"@en ;
+    skos:definition "The rated/design pressure drop across a piece of equipment (e.g. a coil, filter, strainer, or heat exchanger) at rated flow, expressed as a pressure quantity (e.g. Pa, kPa, psi, ft H2O, m H2O). Used by the optimizer for staging and fouling/part-load diagnostics."@en .
+
+wsch_brick:shutoffHeadFactor a owl:DatatypeProperty ;
+    rdfs:label "Shutoff Head Factor Parameter"@en ;
+    skos:definition "The ratio of a pump's shutoff head (total dynamic head at zero flow) to its rated head, used by the optimizer to approximate the pump curve for staging and minimum-flow calculations. A dimensionless number, typically greater than 1"@en ;
+    rdfs:range xsd:decimal .
+
 wsch_brick:aggregatesClass a owl:ObjectProperty ;
     rdfs:label "Aggregates Class" ;
     rdfs:comment "The class that all member points of an aggregate must instantiate" ;
@@ -172,6 +186,18 @@ wsch_brick:Max_Water_Flow_Setpoint_Limit a owl:Class;
     rdfs:subClassOf brick:Limit,
         brick:Max_Limit ;
     skos:definition "A parameter that places an upper bound on the range of permitted values of a Water_Flow_Setpoint."@en .
+
+wsch_brick:Min_Leaving_Chilled_Water_Temperature_Setpoint_Limit a owl:Class;
+    rdfs:label "Min Leaving Chilled Water Temperature Setpoint Limit"@en ;
+    rdfs:subClassOf brick:Limit,
+        brick:Min_Limit ;
+    skos:definition "A parameter that places a lower bound on the range of permitted values of a Leaving_Chilled_Water_Temperature_Setpoint, expressed as a temperature quantity (e.g. DEG_C, DEG_F, K)."@en .
+
+wsch_brick:Max_Leaving_Chilled_Water_Temperature_Setpoint_Limit a owl:Class;
+    rdfs:label "Max Leaving Chilled Water Temperature Setpoint Limit"@en ;
+    rdfs:subClassOf brick:Limit,
+        brick:Max_Limit ;
+    skos:definition "A parameter that places an upper bound on the range of permitted values of a Leaving_Chilled_Water_Temperature_Setpoint, expressed as a temperature quantity (e.g. DEG_C, DEG_F, K)."@en .
 
 wsch_brick:Min_Water_Approach_Temperature_Limit a owl:Class;
     rdfs:label "Min Water Approach Temperature Limit"@en ;
@@ -285,6 +311,21 @@ wsch_brick:Air_Flow_CapacityQuantityShape a owl:Class,
             sh:path brick:value ],
         [ a sh:PropertyShape ;
             sh:in ( unit:KiloGM-PER-SEC unit:FT3-PER-MIN ) ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:path brick:hasUnit ] .
+
+wsch_brick:Pressure_Drop_CapacityQuantityShape a owl:Class,
+        sh:NodeShape,
+        brick:EntityPropertyValue ;
+    rdfs:subClassOf bsh:ValueShape ;
+    sh:property [ a sh:PropertyShape ;
+            sh:maxCount 1 ;
+            sh:minCount 1 ;
+            sh:or bsh:NumericValue ;
+            sh:path brick:value ],
+        [ a sh:PropertyShape ;
+            sh:in ( unit:PA unit:KiloPA unit:PSI unit:FT_H2O unit:M_H2O ) ;
             sh:maxCount 1 ;
             sh:minCount 1 ;
             sh:path brick:hasUnit ] .
