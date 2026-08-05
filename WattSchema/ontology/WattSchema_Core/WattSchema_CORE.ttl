@@ -263,6 +263,10 @@ wattsch:TelemetryPoint a owl:Class ;
     rdfs:label "Telemetry Point" ;
     rdfs:comment "Represents a single measured data point such as voltage, current, frequency, etc." .
 
+wattsch:Status a owl:Class ;
+    rdfs:label "Status" ;
+    rdfs:comment "Status represents the current operating mode, state, position, or condition of an item." .
+
 wattsch:SOP a owl:Class ;
   rdfs:label "SOP" ;
   rdfs:comment "Standard Operating Procedures (SOPs) for critical equipment." .
@@ -1208,6 +1212,25 @@ wattsch:ATSTransferCount a owl:Class ;
   qudt:applicableUnit unit:COUNT ;
   rdfs:comment "Cumulative count of transfer operations performed by an Automatic Transfer Switch." .
 
+wattsch:StartCount a owl:Class ;
+  rdfs:label "Start Count" ;
+  rdfs:subClassOf wattsch:TelemetryPoint ;
+  qudt:quantityKind quantityKind:Count ;
+  qudt:applicableUnit unit:COUNT ;
+  rdfs:comment "Cumulative count of start operations performed by an equipment." .
+
+# ==========================================
+# Status / Mode Classes
+# ==========================================
+wattsch:AlarmStatus a owl:Class ;
+  rdfs:label "Alarm Status" ;
+  rdfs:subClassOf wattsch:Status ;
+  rdfs:comment "Indicates whether an item is currently in an alarm, fault, or normal condition." .
+
+wattsch:OperationMode a owl:Class ;
+  rdfs:label "Operation Mode" ;
+  rdfs:subClassOf wattsch:Status ;
+  rdfs:comment "Indicates the current operating mode an item is running in (e.g., auto, manual, standby)." .
 
 # ==========================================
 # Parameters for Set point / Control points
