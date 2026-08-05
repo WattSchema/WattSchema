@@ -1121,6 +1121,16 @@ wattsch:THDV a owl:Class ;
   rdfs:subClassOf wattsch:TelemetryPoint ;
   qudt:applicableUnit unit:PERCENT .
 
+wattsch:VoltageUnbalance a owl:Class ;
+  rdfs:label "Voltage Unbalance (%)" ;
+  rdfs:subClassOf wattsch:TelemetryPoint ;
+  qudt:applicableUnit unit:PERCENT .
+
+wattsch:CurrentUnbalance a owl:Class ;
+  rdfs:label "Current Unbalance (%)" ;
+  rdfs:subClassOf wattsch:TelemetryPoint ;
+  qudt:applicableUnit unit:PERCENT .
+
 wattsch:Temperature a owl:Class ;
   rdfs:label "Temperature" ;
   owl:equivalentClass brick:Temperature ;
@@ -1147,6 +1157,15 @@ wattsch:EngineCoolantTemperature a owl:Class ;
                       unit:DEG_F,
                       unit:K ;
   rdfs:comment "Temperature of generator engine coolant." .
+
+wattsch:EngineOilTemperature a owl:Class ;
+  rdfs:label "Engine Oil Temperature" ;
+  rdfs:subClassOf wattsch:Temperature ;
+  qudt:quantityKind quantityKind:Temperature ;
+  qudt:applicableUnit unit:DEG_C,
+                      unit:DEG_F,
+                      unit:K ;
+  rdfs:comment "Temperature of generator engine oil." .
 
 wattsch:Humidity a owl:Class ;
   rdfs:label "Humidity (%RH)" ;
@@ -1197,6 +1216,15 @@ wattsch:FuelLevel a owl:Class ;
   qudt:quantityKind quantityKind:DimensionlessRatio ;
   qudt:applicableUnit unit:PERCENT ;
   rdfs:comment "Fuel tank level as percentage of capacity." .
+
+wattsch:FuelTemperature a owl:Class ;
+  rdfs:label "Fuel Temperature" ;
+  rdfs:subClassOf wattsch:Temperature ;
+  qudt:quantityKind quantityKind:Temperature ;
+  qudt:applicableUnit unit:DEG_C,
+                      unit:DEG_F,
+                      unit:K ;
+  rdfs:comment "Temperature of fuel in the system." .
 
 wattsch:LoadingPercentage a owl:Class ;
   rdfs:label "Loading Percentage (%)" ;
