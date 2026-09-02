@@ -1,4 +1,4 @@
-# ODR-010: Add Min/Max Temperature Difference Operational Limit Parameter Classes
+# ODR-010: Add Min/Max Differential Temperature Operational Limit Parameter Classes
 
 ## Context
 
@@ -8,8 +8,8 @@ Chiller-plant and cooling-load points frequently need an operational guard on Δ
 
 Two new classes are added in `WattSchema_Brick_Ext.ttl`:
 
-- `wsch_brick:Min_Temperature_Difference_Operational_Limit` — subclasses `brick:Min_Limit`; places a lower bound on the range of permitted values of an observed temperature difference (e.g., entering minus leaving water temperature).
-- `wsch_brick:Max_Temperature_Difference_Operational_Limit` — subclasses `brick:Max_Limit`; places an upper bound on the range of permitted values of an observed temperature difference.
+- `wsch_brick:Min_Differential_Temperature_Operational_Limit` — subclasses `brick:Min_Limit`; places a lower bound on the range of permitted values of an observed temperature difference (e.g., entering minus leaving water temperature).
+- `wsch_brick:Max_Differential_Temperature_Operational_Limit` — subclasses `brick:Max_Limit`; places an upper bound on the range of permitted values of an observed temperature difference.
 
 These mirror the existing `wsch_brick:Min_Temperature_Operational_Limit`/`wsch_brick:Max_Temperature_Operational_Limit` pattern, but subclass only `brick:Min_Limit`/`brick:Max_Limit` (not `brick:Temperature_Parameter`), since the bounded quantity is a differential temperature rather than an absolute one.
 
