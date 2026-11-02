@@ -131,6 +131,7 @@ Detailed classification of measured data points using QUDT units and quantity ki
 - **`wattsch:Current`**: AC electric current in Amperes.
 - **`wattsch:InputCurrent` / `wattsch:OutputCurrent`**: Device-terminal current direction.
 - **`wattsch:InputCurrentL1/L2/L3` / `wattsch:OutputCurrentL1/L2/L3`**: Per-phase input/output current.
+- **`wattsch:NeutralCurrent`**: Current on the neutral conductor, distinct from input/output current.
 - **`wattsch:DCCurrent`**: DC electric current in Amperes.
 - **`wattsch:DCVoltage`**: DC voltage in Volts.
 - **`wattsch:Frequency`**: System frequency in Hz.
