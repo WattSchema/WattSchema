@@ -857,6 +857,15 @@ wattsch:OutputCurrentL3 a owl:Class ;
                       unit:MegaA ;
   rdfs:comment "Measured current flowing out of the site or device on phase L3." .
 
+wattsch:NeutralCurrent a owl:Class ;
+  rdfs:label "Neutral Current (A)" ;
+  rdfs:subClassOf wattsch:Current ;
+  qudt:quantityKind quantityKind:ElectricCurrent ;
+  qudt:applicableUnit unit:A,
+                      unit:KiloA,
+                      unit:MegaA ;
+  rdfs:comment "Measured current flowing on the neutral conductor of the site or device." .
+
 wattsch:DCCurrent a owl:Class ;
   rdfs:label "DC Current (A)" ;
   rdfs:subClassOf wattsch:Current ;
